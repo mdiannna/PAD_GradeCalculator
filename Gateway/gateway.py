@@ -7,8 +7,8 @@ import redis
 
 app = Flask(__name__)
 
-# redis_cache = None
 redis_cache = redis.Redis(host='localhost', port=6379, db=0)
+
 
 @app.route('/')
 def index():
@@ -34,11 +34,13 @@ def service_discovery():
 
         print("service name:", service_name)
         print("service ip:", service_ip)
-    
-        redis_cache.set(str("service:" + service_name), str(service_ip))
+        
+        try:
+            redis_cache.set(str("service:" + service_name), str(service_ip))
+            return "Service registered"
+        except:
+            return "ERROR! Service not registered"
 
-
-        return "Service registered"
 
     return "Hello! service! You must do a POST request to /service-discovery to register!"
 
@@ -47,14 +49,14 @@ def service_discovery():
 @app.route('/registered-services')
 def get_registered_services():
     result = {}
+
     for key in redis_cache.scan_iter("service:*"):
         value = redis_cache.get(key)
         print(value)
         result[key.decode()] = value.decode()
 
-        # delete the key
-        # redis_cache.delete(key)
     return str(result)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

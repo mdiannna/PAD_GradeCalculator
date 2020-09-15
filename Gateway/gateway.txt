@@ -1,7 +1,6 @@
 This is the folder for gateway
 
 
-request to register a service:
-curl -d '{"json"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-discovery 
-
+exaple requests to register a service: (should be POST)
 curl -d '{"service_name": "Service1", "ip": "111.111.111.111"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-discovery 
+curl -d '{"service_name": "Service5", "ip": "278.678.111.111"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-discovery 
