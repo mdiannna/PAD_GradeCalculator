@@ -4,6 +4,7 @@ from flask import request
 import json
 
 import redis
+import requests
 
 app = Flask(__name__)
 
@@ -14,6 +15,29 @@ redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 def index():
     return "Hello!"
     
+
+
+# TODO: load balancer etc
+@app.route('/<path>')
+def router(path):
+    """ algorithm:
+    1. round robin or other algo - choose an ip from the services that is ready to take the request
+    2. use multiprocessing for this method
+    2.  Request to the respective ip service with multiprocessing (first http, them rpc)
+    3. Async get response"""
+    
+    # service_ip = "" #TODO: choose from registered services
+    # token = "SECRET_KEY"
+
+    # # r = requests.get('https://api.github.com/mdiannna', auth=('user', 'pass'))
+    # r = requests.get(service_ip, token=token)
+    # print(r.status_code)
+    # print(r.headers['content-type'])
+    # print(r.text)
+    # print(r.json())
+
+    return "Path is:" + path
+
 
 @app.route('/test-redis')
 def test_redis():
