@@ -1,6 +1,6 @@
 #!flask/bin/python
 from flask import Flask
-from flask import request
+from flask import request, abort
 import json
 
 import redis
@@ -21,13 +21,19 @@ def index():
 @app.route('/<path>')
 def router(path):
     """ algorithm:
+    0. Check if any services available
     1. round robin or other algo - choose an ip from the services that is ready to take the request
     2. use multiprocessing for this method
     2.  Request to the respective ip service with multiprocessing (first http, them rpc)
     3. Async get response"""
     
-    # service_ip = "" #TODO: choose from registered services
+    # service_ip = "" #TODO: choose from registered services round robin or other more intelligent
     # token = "SECRET_KEY"
+
+
+    if not loadBalancer.any_availabel():
+        # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
+        abort(400)
 
     # # r = requests.get('https://api.github.com/mdiannna', auth=('user', 'pass'))
     # r = requests.get(service_ip, token=token)
@@ -36,7 +42,29 @@ def router(path):
     # print(r.text)
     # print(r.json())
 
+
+
     return "Path is:" + path
+
+
+@app.route("/test-400")
+def test_400():
+    abort(400)
+
+# Example route request load balancing to the service
+# @app.route("/nota-teorie/<NumeStudent>", methods=['GET', 'POST'])
+@app.route("/nota-teorie/<NumeStudent>", methods=['POST'])
+def nota_teorie(NumeStudent):
+    # result, status = Make request to loadBalancer.next() + "/nota-teorie/" + NumeStudent
+    status = "Error" # ???
+
+    result = {
+        "result": "Nota teorie test TODO: finish requests!!!",
+        "status": status
+    }
+
+    return result
+
 
 
 @app.route('/test-redis')
@@ -46,8 +74,9 @@ def test_redis():
     return "Hello, World!" + str(redis_cache.get('foo'))
 
 
-@app.route('/service-discovery', methods=['GET', 'POST'])
-def service_discovery():
+# @app.route('/service-discovery', methods=['GET', 'POST'])
+@app.route('/service-register', methods=['GET', 'POST'])
+def service_register():
     if request.method == 'POST':
         print(request.data)
         print(request.json)
