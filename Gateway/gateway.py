@@ -24,7 +24,6 @@ def index():
     return "Hello!"
     
 
-
 # TODO: load balancer etc
 @app.route('/<path>')
 def router(path):
@@ -37,8 +36,8 @@ def router(path):
     
     # service_ip = "" #TODO: choose from registered services round robin or other more intelligent
     # token = "SECRET_KEY"
-
-    allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2)
+ 
+    allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2) ???  sau alta metoda???
 
     if path not in allowed_paths:
         return abort(404, "Page not found")
@@ -79,6 +78,7 @@ def router(path):
 @app.route("/test-400")
 def test_400():
     abort(400)
+
 
 # Example route request load balancing to the service
 # @app.route("/nota-teorie/<NumeStudent>", methods=['GET', 'POST'])
