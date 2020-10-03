@@ -1,4 +1,8 @@
-# class LoadBalancerRoundRobin():
+# QUESTION (pe jumate) e ok sa dau la functii parametri redis_cache? sau cum sa fac global???
+
+
+# class LoadBalancerRoundRobin(): # TODO: roundrobin pe urma bonus balancing based on service load
+# QUESTION:  cum facem load balancerul cu mai multe servicii (1 calculeaza media pe semestru si cealalta etc, dar sunt diferite round robinuri se primeste) ????
 class LoadBalancer():
 
 	def any_available(self, redis_cache):
@@ -18,19 +22,12 @@ class LoadBalancer():
 		return len(all_services_l)>0
 		
 
-	def next(self):
+	def next(self, redis_cache):
 		# https://redis.io/commands/rpoplpush
-		redis_cache.rpoplpush("services", "services")   
+		# TODO: schimbat cumva cu cheie valoare
 
 		# circuitbreaker.new()....
-		# rpoplpush("services", "services")   
-
-
-
-# class LoadBalancer
-#   def self.any_available?
-#     Cache.current.llen("services") > 0
-#   end
+		redis_cache.rpoplpush("services", "services")   
 
 #   def self.next
 #     CircuitBreaker.new(

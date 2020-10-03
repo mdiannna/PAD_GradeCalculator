@@ -14,6 +14,8 @@ app = Flask(__name__)
 # TODO maybe:
 # redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
 
+
+# TODO -- QUESTION: why id doesn't clear when running the server??
 redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 loadBalancer = LoadBalancer()
 
@@ -36,6 +38,11 @@ def router(path):
     # service_ip = "" #TODO: choose from registered services round robin or other more intelligent
     # token = "SECRET_KEY"
 
+    allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2)
+
+    if path not in allowed_paths:
+        return abort(404, "Page not found")
+
 
     if not loadBalancer.any_available(redis_cache):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
@@ -48,24 +55,25 @@ def router(path):
     # print(r.text)
     # print(r.json())
 
-    # TODO: finish here
     parameters = {
-        request: request.method,
-        path: 
+        "request": request.method,
+        "path": request.path,
+        "parameters": request.data
     }
 
-    response = LoadBalancer.next.request(
-        method:  request.request_method,
-        path:    request.path,
-        payload: request.body.read
-      )
 
-  json(JSON.parse(response.body))
+    # TODO: finish here    QUESTION
+    # response = LoadBalancer.next.request(parameters) #TODO python
 
+    # response = LoadBalancer.next.request(
+    #     method:  request.request_method,
+    #     path:    request.path,
+    #     payload: request.body.read
+    #   )
 
-
-
-    return "Path is:" + path
+    response = "{'response':'test_response lallala'"    
+    # json(JSON.parse(response.body))
+    return json.dumps(response)
 
 
 @app.route("/test-400")
@@ -88,7 +96,7 @@ def nota_teorie(NumeStudent):
     return result
 
 
-
+# TODO: delete after testing and clear cache!
 @app.route('/test-redis')
 def test_redis():
     # redis_cache.set('foo', 'bar')
