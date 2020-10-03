@@ -2,14 +2,20 @@
 from flask import Flask
 from flask import request, abort
 import json
-
 import redis
 import requests
+from loadbalancer import LoadBalancer
 
 app = Flask(__name__)
 
-redis_cache = redis.Redis(host='localhost', port=6379, db=0)
+# redis documentation:
+# https://redis-py.readthedocs.io/en/stable/
 
+# TODO maybe:
+# redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+redis_cache = redis.Redis(host='localhost', port=6379, db=0)
+loadBalancer = LoadBalancer()
 
 @app.route('/')
 def index():
@@ -31,9 +37,9 @@ def router(path):
     # token = "SECRET_KEY"
 
 
-    if not loadBalancer.any_availabel():
+    if not loadBalancer.any_available(redis_cache):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
-        abort(400)
+        return abort(400, "No services available")
 
     # # r = requests.get('https://api.github.com/mdiannna', auth=('user', 'pass'))
     # r = requests.get(service_ip, token=token)
@@ -41,6 +47,21 @@ def router(path):
     # print(r.headers['content-type'])
     # print(r.text)
     # print(r.json())
+
+    # TODO: finish here
+    parameters = {
+        request: request.method,
+        path: 
+    }
+
+    response = LoadBalancer.next.request(
+        method:  request.request_method,
+        path:    request.path,
+        payload: request.body.read
+      )
+
+  json(JSON.parse(response.body))
+
 
 
 
@@ -55,6 +76,7 @@ def test_400():
 # @app.route("/nota-teorie/<NumeStudent>", methods=['GET', 'POST'])
 @app.route("/nota-teorie/<NumeStudent>", methods=['POST'])
 def nota_teorie(NumeStudent):
+    # asta daca toate serviciile sunt la fel, noi insa vom avea 2 tipuri diferite de servicii!!!
     # result, status = Make request to loadBalancer.next() + "/nota-teorie/" + NumeStudent
     status = "Error" # ???
 
@@ -69,9 +91,10 @@ def nota_teorie(NumeStudent):
 
 @app.route('/test-redis')
 def test_redis():
-    redis_cache.set('foo', 'bar')
+    # redis_cache.set('foo', 'bar')
 
-    return "Hello, World!" + str(redis_cache.get('foo'))
+    # return "Hello, World!" + str(redis_cache.get('foo'))
+    return "Hello, World! ------   "  + str(redis_cache.get('service:Service5'))
 
 
 # @app.route('/service-discovery', methods=['GET', 'POST'])
@@ -84,6 +107,7 @@ def service_register():
 
         service_name = request.json["service_name"]
         service_ip = request.json["ip"]
+        # TODO: add service type, and save as "service:servicetype:name"
 
         print("service name:", service_name)
         print("service ip:", service_ip)
@@ -103,6 +127,7 @@ def service_register():
 def get_registered_services():
     result = {}
 
+    # TODO: add service type, and save as "service:servicetype:name"
     for key in redis_cache.scan_iter("service:*"):
         value = redis_cache.get(key)
         print(value)
