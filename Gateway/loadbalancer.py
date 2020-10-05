@@ -27,7 +27,10 @@ class LoadBalancer():
 		# TODO: schimbat cumva cu cheie valoare
 
 		# circuitbreaker.new()....
-		redis_cache.rpoplpush("services", "services")   
+		redis_cache.rpoplpush("service", "service")   
+
+		# redis_cache.get()
+
 
 #   def self.next
 #     CircuitBreaker.new(
@@ -35,3 +38,11 @@ class LoadBalancer():
 #     )
 #   end
 # end
+
+
+# BONUS: Load Balancer based on service load:
+# (ceva cu status - trebuie sa faca request la servicii sa vada statusul lor )
+# https://www.nginx.com/resources/glossary/load-balancing/
+# o varianta posibila:
+# Least Connections – A new request is sent to the server with the fewest current connections to clients. 
+#     The relative computing capacity of each server is factored into determining which one has the least connections.
