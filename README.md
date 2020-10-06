@@ -8,7 +8,7 @@
 - `POST /init-student {“student”: “NumePrenume”, “grupa” :”FAF”}`
 - `PUT /nota { “student”: “NumePrenume1”, “nota”:10, “type”: “teorie”, “nr_atestare”:1}      type teorie/practica`
 - `GET /status {“student” :”NumePrenume”}  => {“status” :”processing}`
-- `GET /nota-atestare/nr_atestare => {“student”: “NumePrenume”, “grupa”: “FAF171”, “nr_Atestare” :”nr_atestare”, “nota” : “nota”}`
+- `GET /nota-atestare => {“student”: “NumePrenume”, “grupa”: “FAF171”, “nr_atestare” :”nr_atestare”, “nota” : “nota”}`
 
 #### Serviciu de tip 2:
 - `POST /nota-examen { “student”: “NumePrenume1”, “nota”:7}`
