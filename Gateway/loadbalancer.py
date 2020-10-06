@@ -5,7 +5,7 @@
 # QUESTION:  cum facem load balancerul cu mai multe servicii (1 calculeaza media pe semestru si cealalta etc, dar sunt diferite round robinuri se primeste) ????
 class LoadBalancer():
 
-	def any_available(self, redis_cache):
+	def any_available(self, redis_cache, service_type):
 		""" returns boolean"""
 		all_services = redis_cache.scan_iter("service:*")
 		all_services_l = list(all_services)
@@ -22,7 +22,7 @@ class LoadBalancer():
 		return len(all_services_l)>0
 		
 
-	def next(self, redis_cache):
+	def next(self, redis_cache, service_type):
 		# https://redis.io/commands/rpoplpush
 		# TODO: schimbat cumva cu cheie valoare
 

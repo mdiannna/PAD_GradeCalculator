@@ -37,13 +37,27 @@ def router(path):
     # service_ip = "" #TODO: choose from registered services round robin or other more intelligent
     # token = "SECRET_KEY"
  
-    allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2) ???  sau alta metoda???
+
+    map_service_type_paths = {
+        "init-student" : "type1",
+        "nota" : "type1",
+        "nota-atestare" : "type1",
+
+        "nota-examen" : "type2",
+        "pune-nota-atestare" : "type2",
+        "nota-finala": "type2"
+    }
+
+    # allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2) ???  sau alta metoda???
+    allowed_paths = map_service_type_paths.keys()
 
     if path not in allowed_paths:
         return abort(404, "Page not found")
 
 
-    if not loadBalancer.any_available(redis_cache):
+    service_type = map_service_type_paths[path]
+
+    if not loadBalancer.any_available(redis_cache, service_type):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
         return abort(400, "No services available")
 
@@ -63,6 +77,7 @@ def router(path):
 
     # TODO: finish here    QUESTION
     # response = LoadBalancer.next.request(parameters) #TODO python
+    # response = LoadBalancer.next(service_type).request(parameters) #TODO python
 
     # response = LoadBalancer.next.request(
     #     method:  request.request_method,
@@ -70,9 +85,10 @@ def router(path):
     #     payload: request.body.read
     #   )
 
-    response = "{'response':'test_response lallala'"    
+    response = {'response':'test_response lallala', "service_type":service_type, "path":path}
     # json(JSON.parse(response.body))
-    return json.dumps(response)
+    # return json.dumps(response)
+    return response
 
 
 @app.route("/test-400")
@@ -80,20 +96,20 @@ def test_400():
     abort(400)
 
 
-# Example route request load balancing to the service
-# @app.route("/nota-teorie/<NumeStudent>", methods=['GET', 'POST'])
-@app.route("/nota-teorie/<NumeStudent>", methods=['POST'])
-def nota_teorie(NumeStudent):
-    # asta daca toate serviciile sunt la fel, noi insa vom avea 2 tipuri diferite de servicii!!!
-    # result, status = Make request to loadBalancer.next() + "/nota-teorie/" + NumeStudent
-    status = "Error" # ???
+# # Example route request load balancing to the service
+# # @app.route("/nota-teorie/<NumeStudent>", methods=['GET', 'POST'])
+# @app.route("/nota-teorie/<NumeStudent>", methods=['POST'])
+# def nota_teorie(NumeStudent):
+#     # asta daca toate serviciile sunt la fel, noi insa vom avea 2 tipuri diferite de servicii!!!
+#     # result, status = Make request to loadBalancer.next() + "/nota-teorie/" + NumeStudent
+#     status = "Error" # ???
 
-    result = {
-        "result": "Nota teorie test TODO: finish requests!!!",
-        "status": status
-    }
+#     result = {
+#         "result": "Nota teorie test TODO: finish requests!!!",
+#         "status": status
+#     }
 
-    return result
+#     return result
 
 
 # TODO: delete after testing and clear cache!
@@ -105,9 +121,11 @@ def test_redis():
     return "Hello, World! ------   "  + str(redis_cache.get('service:Service5'))
 
 
-# @app.route('/service-discovery', methods=['GET', 'POST'])
 @app.route('/service-register', methods=['GET', 'POST'])
 def service_register():
+    if request.method == 'GET':
+        return abort(405, "Method not allowed. Please make a POST request") #Method not allowed
+  
     if request.method == 'POST':
         print(request.data)
         print(request.json)
@@ -115,10 +133,12 @@ def service_register():
 
         service_name = request.json["service_name"]
         service_ip = request.json["ip"]
+        service_type = request.json["type"]
         # TODO: add service type, and save as "service:servicetype:name"
 
         print("service name:", service_name)
         print("service ip:", service_ip)
+        print("service type:", service_type)
         
         try:
             redis_cache.set(str("service:" + service_name), str(service_ip))
@@ -127,7 +147,7 @@ def service_register():
             return "ERROR! Service not registered"
 
 
-    return "Hello! service! You must do a POST request to /service-discovery to register!"
+    return "Hello! service! You must do a POST request to /service-register to register!"
 
     
 
