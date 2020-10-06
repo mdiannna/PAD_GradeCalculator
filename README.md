@@ -13,6 +13,7 @@
 - `GET /nota-examen/NumePrenume // sau cu ?`
 - `POST /nota-atestare { “student”: “NumePrenume1”, “nota”: 9, “nr_atestare”}`
 - `GET /nota-finala/NumePrenume1 => {“student”: “NumePrenume1”, “note_atestari”: [“atest1”: nota, “atest2”: “”] “nota_examen” : nota_examen ,“nota_finala”: 9.88} (daca o atestare lipseste, sau examenul, la nota finala ii returneaza eroare)`
+- `GET /status {“student” :”NumePrenume”}  => {“status” :”processing}`
 
 #### Request register service: (de la servicii spre gateway)
 - `POST /service-register cu parametrii {“service_name”, “ip”, “type”} (type poate sa fie type1 sau type2)`
