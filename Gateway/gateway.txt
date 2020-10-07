@@ -8,6 +8,8 @@ curl -d '{"service_name": "Service5", "address": "278.678.111.111", "type":"type
 - pentru test service;
 curl -d '{"service_name": "Service1_new", "address": "http://127.0.0.1:6005/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register 
 
+- test service rpc
+curl -d '{"service_name": "Service1_new", "address": "http://127.0.0.1:6005/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register 
 
 - check /nota-teorie service: (with POST request)
 curl -d '{"Hello!"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/nota-teorie?student=NumePrenume

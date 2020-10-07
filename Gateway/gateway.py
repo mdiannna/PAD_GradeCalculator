@@ -7,11 +7,16 @@ import requests
 from loadbalancer import LoadBalancer
 from circuitbreaker import CircuitBreaker
 from termcolor import colored
+# from jsonrpcserver import method, dispatch
+# from jsonrpcclient import request as rpc_request
 
 app = Flask(__name__)
 
 # redis documentation:
 # https://redis-py.readthedocs.io/en/stable/
+
+#json-rpc documentation:
+# https://bcb.github.io/jsonrpc/flask
 
 # TODO maybe:
 # redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')

@@ -1,10 +1,12 @@
 from errors_handling import CustomError, CustomError
 import requests
 from termcolor import colored
+from jsonrpcclient import request as rpc_request
 
 class CircuitBreaker:
     # FAILURE_THRESHOLD = 3
     FAILURE_THRESHOLD = 5
+    TYPE_REQUESTS = 'RPC'
 
     # def __init__(address, service_name):
     def __init__(self, address, service_type):
@@ -30,19 +32,28 @@ class CircuitBreaker:
 
         while nr_requests_failed < self.FAILURE_THRESHOLD:
             try:
-                if method=='GET':
-                    r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
-                elif method=='POST':
-                    r = requests.post(endpoint, data=params["parameters"].decode("utf-8"))
-                elif method=='PUT':
-                    r = requests.put(endpoint, data=params["parameters"].decode("utf-8"))
-                elif method=='DELETE':
-                    r = requests.delete(endpoint)
-                print(r)    
-                data = r.json()
-                print(data)
-                print(colored("Response from service:----", "green"), r.json())
-                return r.json()
+                if self.TYPE_REQUESTS == 'RPC':
+                    print("---RPC")
+                    r = rpc_request(str(self.address.decode("utf-8") ), str(params["path"]).replace("/", "").replace("-", "_")).data.result
+
+                elif self.TYPE_REQUESTS == 'HTTP':
+                    print("---HTTP")
+
+                    if method=='GET':
+                        r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
+                    elif method=='POST':
+                        r = requests.post(endpoint, data=params["parameters"].decode("utf-8"))
+                    elif method=='PUT':
+                        r = requests.put(endpoint, data=params["parameters"].decode("utf-8"))
+                    elif method=='DELETE':
+                        r = requests.delete(endpoint)
+
+                    print(r)    
+                    data = r.json()
+                    print(data)
+                    print(colored("Response from service:----", "green"), r.json())
+                    return r.json()
+                
             except Exception as e:
 
                 # TODO: catch specific exceptions
