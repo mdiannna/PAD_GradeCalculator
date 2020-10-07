@@ -1,9 +1,10 @@
 from errors_handling import CustomError, CustomError
 import requests
+from termcolor import colored
 
 class CircuitBreaker:
-    FAILURE_THRESHOLD = 3
-    # FAILURE_THRESHOLD = 5
+    # FAILURE_THRESHOLD = 3
+    FAILURE_THRESHOLD = 5
 
     # def __init__(address, service_name):
     def __init__(self, address, service_type):
@@ -19,7 +20,7 @@ class CircuitBreaker:
             # TODO; check
             return {"status": "error", "message":"Circuit breaker tripped"}
 
-        endpoint = str(self.address) + str(params["path"])
+        endpoint = str(self.address.decode("utf-8") ) + str(params["path"]).replace("/", "")
         print(colored("service endpoint:---" + endpoint, "green"))
 
         # RestClient::Request.execute(params.merge(url:endpoint))
@@ -30,20 +31,28 @@ class CircuitBreaker:
         while nr_requests_failed < self.FAILURE_THRESHOLD:
             try:
                 if method=='GET':
-                    r = requests.get(endpoint, params=params["parameters"])
+                    r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
                 elif method=='POST':
-                    r = requests.post(endpoint, data=params["parameters"])
+                    r = requests.post(endpoint, data=params["parameters"].decode("utf-8"))
                 elif method=='PUT':
-                    r = requests.put(endpoint, data=params["parameters"])
+                    r = requests.put(endpoint, data=params["parameters"].decode("utf-8"))
                 elif method=='DELETE':
                     r = requests.delete(endpoint)
-                return r
-            except:
+                print(r)    
+                data = r.json()
+                print(data)
+                print(colored("Response from service:----", "green"), r.json())
+                return r.json()
+            except Exception as e:
+
                 # TODO: catch specific exceptions
                 # QUESTION: why we need redis_key and what is this???
                 # result = redis_cache.incr(redis_key) # QUESTION cum incrementam daca redis_key e adresa, deci string??
 
                 nr_requests_failed +=1
+                print(colored("----Request failed:----", "red"))
+                print(e)
+
                 # result = Cache.current.incr(redis_key)
 
 
@@ -54,7 +63,7 @@ class CircuitBreaker:
             self.remove_from_cache(redis_cache)
             self.tripped = True
 
-        return ""
+        return {"status":"error", "message": "Request to service failed"}
 
     def clear(self, address):
         self.address = None
