@@ -1,33 +1,41 @@
+from circuitbreaker  import CircuitBreaker
 # QUESTION (pe jumate) e ok sa dau la functii parametri redis_cache? sau cum sa fac global???
 
 
 # class LoadBalancerRoundRobin(): # TODO: roundrobin pe urma bonus balancing based on service load
 # QUESTION:  cum facem load balancerul cu mai multe servicii (1 calculeaza media pe semestru si cealalta etc, dar sunt diferite round robinuri se primeste) ????
-class LoadBalancer():
+class LoadBalancer:
 
-	def any_available(self, redis_cache):
+	def any_available(self, redis_cache, service_type):
 		""" returns boolean"""
-		all_services = redis_cache.scan_iter("service:*")
-		all_services_l = list(all_services)
+		# all_services = redis_cache.scan_iter("service:*")
+		# all_services_l = list(all_services)
 
-		print("all services:", all_services_l)
-		# return True
-		print(len(all_services_l))
+		# print("all services:", all_services_l)
+		# # return True
+		# print(len(all_services_l))
 
-		# varianta din laborator pentru circular list
-		# print(redis_cache.llen("services"))
-		#varianta 2 daca in cache avem doar servicii:
-		# print(redis_cache.dbsize())
+		# # varianta din laborator pentru circular list
+		# # print(redis_cache.llen("services"))
+		# #varianta 2 daca in cache avem doar servicii:
+		# # print(redis_cache.dbsize())
 
-		return len(all_services_l)>0
+		# return len(all_services_l)>0
+		return redis_cache.llen("services")
 		
 
-	def next(self, redis_cache):
+	def next(self, redis_cache, service_type):
 		# https://redis.io/commands/rpoplpush
 		# TODO: schimbat cumva cu cheie valoare
 
+		circuitbreaker = CircuitBreaker(redis_cache.rpoplpush("services", "services"), service_type)
+		return circuitbreaker
+
+
 		# circuitbreaker.new()....
-		redis_cache.rpoplpush("services", "services")   
+		
+		# redis_cache.get()
+
 
 #   def self.next
 #     CircuitBreaker.new(
@@ -35,3 +43,11 @@ class LoadBalancer():
 #     )
 #   end
 # end
+
+
+# BONUS: Load Balancer based on service load:
+# (ceva cu status - trebuie sa faca request la servicii sa vada statusul lor )
+# https://www.nginx.com/resources/glossary/load-balancing/
+# o varianta posibila:
+# Least Connections – A new request is sent to the server with the fewest current connections to clients. 
+#     The relative computing capacity of each server is factored into determining which one has the least connections.
