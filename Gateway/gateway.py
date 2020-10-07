@@ -5,6 +5,8 @@ import json
 import redis
 import requests
 from loadbalancer import LoadBalancer
+from circuitbreaker import CircuitBreaker
+from termcolor import colored
 
 app = Flask(__name__)
 
@@ -17,7 +19,7 @@ app = Flask(__name__)
 
 # TODO -- QUESTION: why id doesn't clear when running the server??
 redis_cache = redis.Redis(host='localhost', port=6379, db=0)
-loadBalancer = LoadBalancer()
+load_balancer = LoadBalancer()
 
 @app.route('/')
 def index():
@@ -25,7 +27,7 @@ def index():
     
 
 # TODO: load balancer etc
-@app.route('/<path>')
+@app.route('/<path>', methods=['GET', 'POST'])
 def router(path):
     """ algorithm:
     0. Check if any services available
@@ -57,7 +59,7 @@ def router(path):
 
     service_type = map_service_type_paths[path]
 
-    if not loadBalancer.any_available(redis_cache, service_type):
+    if not load_balancer.any_available(redis_cache, service_type):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
         return abort(400, "No services available")
 
@@ -69,7 +71,6 @@ def router(path):
     # print(r.json())
 
     parameters = {
-        "request": request.method,
         "path": request.path,
         "parameters": request.data
     }
@@ -77,6 +78,10 @@ def router(path):
 
     # TODO: finish here    QUESTION
     # response = LoadBalancer.next.request(parameters) #TODO python
+    print(colored("parameters:", "magenta"), parameters)
+
+    circuit_breaker = load_balancer.next(redis_cache, service_type)
+    service_response = circuit_breaker.request(redis_cache, parameters, request.method)
     # response = LoadBalancer.next(service_type).request(parameters) #TODO python
 
     # response = LoadBalancer.next.request(
@@ -85,7 +90,7 @@ def router(path):
     #     payload: request.body.read
     #   )
 
-    response = {'response':'test_response lallala', "service_type":service_type, "path":path}
+    response = {'response':service_response, "service_type":service_type, "path":path}
     # json(JSON.parse(response.body))
     # return json.dumps(response)
     return response
@@ -101,7 +106,7 @@ def test_400():
 # @app.route("/nota-teorie/<NumeStudent>", methods=['POST'])
 # def nota_teorie(NumeStudent):
 #     # asta daca toate serviciile sunt la fel, noi insa vom avea 2 tipuri diferite de servicii!!!
-#     # result, status = Make request to loadBalancer.next() + "/nota-teorie/" + NumeStudent
+#     # result, status = Make request to load_balancer.next() + "/nota-teorie/" + NumeStudent
 #     status = "Error" # ???
 
 #     result = {
@@ -132,22 +137,24 @@ def service_register():
         print("Service discovered!")
 
         service_name = request.json["service_name"]
-        service_ip = request.json["ip"]
+        service_address = request.json["address"]
         service_type = request.json["type"]
         # TODO: add service type, and save as "service:servicetype:name"
 
-        print("service name:", service_name)
-        print("service ip:", service_ip)
-        print("service type:", service_type)
+        print(colored("service name:", "red"), service_name)
+        print(colored("service address:", "red"), service_address)
+        print(colored("service type:", "red"), service_type)
         
         try:
-            redis_cache.set(str("service:" + service_name), str(service_ip))
-            return "Service registered"
+            # redis_cache.set(str("service:" + service_name), str(service_ip))
+            redis_cache.lpush("services", service_address)
+            print("yes!")
+            return {"status": "success", "message": "Service registered"}
         except:
-            return "ERROR! Service not registered"
+            return {"status":"error", "message": "ERROR! Service not registered"}
 
 
-    return "Hello! service! You must do a POST request to /service-register to register!"
+    return {"status": "error", "message":"Hello! service! You must do a POST request to /service-register to register!"}
 
     
 
@@ -155,12 +162,17 @@ def service_register():
 def get_registered_services():
     result = {}
 
-    # TODO: add service type, and save as "service:servicetype:name"
-    for key in redis_cache.scan_iter("service:*"):
-        value = redis_cache.get(key)
-        print(value)
-        result[key.decode()] = value.decode()
+    # # TODO: add service type, and save as "service:servicetype:name"
+    # for key in redis_cache.scan_iter("service:*"):
+    #     value = redis_cache.get(key)
+    #     print(value)
+    #     result[key.decode()] = value.decode()
 
+
+    l = redis_cache.lrange('services', 0, -1)
+    result = [x for x in l]
+    # for x in l:
+    #   print x
     return str(result)
 
 
