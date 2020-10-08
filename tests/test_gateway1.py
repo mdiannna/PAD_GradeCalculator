@@ -37,6 +37,8 @@ def register_service(service_name, address, service_type):
     except Exception as e:
         print(colored("---error in request", "red"), e)
         print(colored("status code:"+str(r.status_code), "red"))
+        print(colored(str(r), "red"))
+        print(colored(str(r.text), "red"))
 
     
 
@@ -60,6 +62,8 @@ def request_init_student_dash(student_name, group):
     except Exception as e:
         print(colored("---error in request", "red"), e)
         print(colored("status code:"+str(r.status_code), "red"))
+        print(colored(str(r), "red"))
+        print(colored(str(r.text), "red"))
 
 
 
@@ -76,6 +80,7 @@ def get_registered_services():
     except Exception as e:
         print(colored("---error in request", "red"), e)
         print(colored("status code:"+str(r.status_code), "red"))
+        print(colored(str(r.text), "red"))
         
 
 
