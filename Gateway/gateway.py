@@ -74,9 +74,9 @@ def router(path):
     circuit_breaker = load_balancer.next(redis_cache, service_type)
     service_response = circuit_breaker.request(redis_cache, parameters, request.method)
  
-    response = {'response':service_response, "service_type":service_type, "path":path}
- 
-    return response
+    # response = {'response':service_response, "service_type":service_type, "path":path} 
+    # return response
+    return service_response
 
 
 @app.route("/test-400")

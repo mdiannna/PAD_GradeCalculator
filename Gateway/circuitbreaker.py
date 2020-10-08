@@ -3,11 +3,13 @@ import requests
 from termcolor import colored
 from jsonrpcclient import request as rpc_request
 import json
+from flask import abort
 
 class CircuitBreaker:
     FAILURE_THRESHOLD = 5
-    TYPE_REQUESTS = 'RPC'  # this can be 'RPC' or 'HTTP'
+    # TYPE_REQUESTS = 'RPC'  # this can be 'RPC' or 'HTTP'
     # TYPE_REQUESTS = 'HTTP'  # this can be 'RPC' or 'HTTP'
+    TYPE_REQUESTS = 'haha'  # should return error
 
     # def __init__(address, service_name):
     def __init__(self, address, service_type):
@@ -17,6 +19,11 @@ class CircuitBreaker:
 
 
     def request(self, redis_cache, params, method):
+
+        if self.TYPE_REQUESTS not in ['RPC', 'HTTP']:
+            return abort(500, {"error": "Please set TYPE_REQUESTS to 'HTTP' or 'RPC' in circuitbreaker!!!"})
+        
+
         if self.tripped:
             remove_from_cache(redis_cache)
             raise CustomError("Circuit breaker tripped")
@@ -24,7 +31,7 @@ class CircuitBreaker:
             return {"status": "error", "message":"Circuit breaker tripped"}
 
         endpoint = str(self.address.decode("utf-8") ) + str(params["path"]).replace("/", "")
-        print(colored("service endpoint:---" + endpoint, "green"))
+        print(colored("service endpoint:---" + endpoint, "cyan"))
 
         # RestClient::Request.execute(params.merge(url:endpoint))
         # rescue errno:ErrorConfused   ???? what is this  QUESTION
@@ -61,6 +68,7 @@ class CircuitBreaker:
                     print(data)
                     print(colored("Response from service:----", "green"), r.json())
                     return r.json()
+               
                 
             except Exception as e:
 
@@ -82,6 +90,7 @@ class CircuitBreaker:
         if nr_requests_failed >= self.FAILURE_THRESHOLD:
             self.remove_from_cache(redis_cache)
             self.tripped = True
+
 
         return {"status":"error", "message": "Request to service failed", "error":last_error}
 

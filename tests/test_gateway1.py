@@ -36,6 +36,7 @@ def register_service(service_name, address, service_type):
 
     except Exception as e:
         print(colored("---error in request", "red"), e)
+        print(colored("status code:"+str(r.status_code), "red"))
 
     
 
@@ -58,6 +59,8 @@ def request_init_student_dash(student_name, group):
 
     except Exception as e:
         print(colored("---error in request", "red"), e)
+        print(colored("status code:"+str(r.status_code), "red"))
+
 
 
 def get_registered_services():
@@ -72,7 +75,8 @@ def get_registered_services():
         pp.pprint(r.json())
     except Exception as e:
         print(colored("---error in request", "red"), e)
-
+        print(colored("status code:"+str(r.status_code), "red"))
+        
 
 
 # do not forget to change parameter to 'RPC' in circuitbreaker!
@@ -93,7 +97,7 @@ def test_gateway_http():
 
 if __name__ == '__main__':
     # HTTP:
-    # test_gateway_http()
+    test_gateway_http()
 
     # RPC:
-    test_gateway_rpc()
+    # test_gateway_rpc()
