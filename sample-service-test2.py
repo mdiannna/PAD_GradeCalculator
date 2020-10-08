@@ -13,7 +13,7 @@ def index():
     return "Hello!"
 
 
-@app.route('/init-student', methods=['POST'])
+@app.route('/init_student', methods=['POST'])
 def init_student():
     return {"message": "Hello student!"}
 

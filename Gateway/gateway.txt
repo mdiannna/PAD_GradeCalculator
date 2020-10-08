@@ -8,6 +8,8 @@ curl -d '{"service_name": "Service5", "address": "278.678.111.111", "type":"type
 - pentru test service;
 curl -d '{"service_name": "Service1_new", "address": "http://127.0.0.1:6005/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register 
 
+- test service rpc
+curl -d '{"service_name": "ServiceRPC1_new", "address": "http://127.0.0.1:6003/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register 
 
 - check /nota-teorie service: (with POST request)
 curl -d '{"Hello!"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/nota-teorie?student=NumePrenume
@@ -25,4 +27,22 @@ curl  http://127.0.0.1:5000/registered-services
 
 
 
-curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:6005/init-student
+- pentru requesturi directe la servicii:
+curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:6005/init_student
+curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:6004/init_student
+curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:6003/init_student
+
+
+- pentru requesturi cum ar trebui sa fie la gateway (daca ruleaza pe portul 5000)
+curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
+curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
+curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
+
+
+
+Notite:
+- de citit despre circuit breaker aici:
+https://martinfowler.com/bliki/CircuitBreaker.html
+- de verificat daca circuit breaker lucreaza ok, poate ar trebui daca un service e fail sa treaca la urmatorul si sa incrementeze in cache fail, apoi cand failuieste de mai mutle ori sa-l scoata din cache, nu deodata????
+- redis_key pentru ce totusi????
+- 2 circular lists pentru diferite service type
