@@ -26,7 +26,6 @@ curl  http://127.0.0.1:5000/registered-services
 
 
 
-
 - pentru requesturi directe la servicii:
 curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:6005/init_student
 curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:6004/init_student
@@ -38,10 +37,3 @@ curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: appl
 curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
 curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
 
-
-
-Notite:
-- de citit despre circuit breaker aici:
-https://martinfowler.com/bliki/CircuitBreaker.html
-- de verificat daca circuit breaker lucreaza ok, poate ar trebui daca un service e fail sa treaca la urmatorul si sa incrementeze in cache fail, apoi cand failuieste de mai mutle ori sa-l scoata din cache, nu deodata????
-- redis_key pentru ce totusi????
