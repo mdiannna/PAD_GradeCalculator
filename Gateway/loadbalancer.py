@@ -21,14 +21,14 @@ class LoadBalancer:
 		# # print(redis_cache.dbsize())
 
 		# return len(all_services_l)>0
-		return redis_cache.llen("services")
+		return redis_cache.llen("services-" + str(service_type))
 		
 
 	def next(self, redis_cache, service_type):
 		# https://redis.io/commands/rpoplpush
 		# TODO: schimbat cumva cu cheie valoare
 
-		circuitbreaker = CircuitBreaker(redis_cache.rpoplpush("services", "services"), service_type)
+		circuitbreaker = CircuitBreaker(redis_cache.rpoplpush("services-"+str(service_type), "services-"+str(service_type)), service_type)
 		return circuitbreaker
 
 
