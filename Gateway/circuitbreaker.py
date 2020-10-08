@@ -5,13 +5,13 @@ from jsonrpcclient import request as rpc_request
 import json
 from flask import abort
 
+
 class CircuitBreaker:
-    FAILURE_THRESHOLD = 5
+    FAILURE_THRESHOLD = 3
     # TYPE_REQUESTS = 'RPC'  # this can be 'RPC' or 'HTTP'
     TYPE_REQUESTS = 'HTTP'  # this can be 'RPC' or 'HTTP'
     # TYPE_REQUESTS = 'haha'  # should return error
 
-    # def __init__(address, service_name):
     def __init__(self, address, service_type):
         self.address = address
         self.tripped = False
@@ -33,60 +33,47 @@ class CircuitBreaker:
         endpoint = str(self.address.decode("utf-8") ) + str(params["path"]).replace("/", "")
         print(colored("service endpoint:---" + endpoint, "cyan"))
 
-        # RestClient::Request.execute(params.merge(url:endpoint))
-        # rescue errno:ErrorConfused   ???? what is this  QUESTION
-
-        nr_requests_failed = 0
         last_error = ""
 
-        while nr_requests_failed < self.FAILURE_THRESHOLD:
-            try:
-                if self.TYPE_REQUESTS == 'RPC':
-                    print(colored("---RPC", "blue"))
-                    route = str(params["path"]).replace("/", "").replace("-", "_")
-                    print("-> route:", route)
-                    r = rpc_request(str(self.address.decode("utf-8")), route).data.result
+        try:
+            if self.TYPE_REQUESTS == 'RPC':
+                print(colored("---RPC", "blue"))
+                route = str(params["path"]).replace("/", "").replace("-", "_")
+                print("-> route:", route)
+                r = rpc_request(str(self.address.decode("utf-8")), route).data.result
 
-                    print(colored("Response from service:----", "green"), r)
-                    print(colored("Response from service decoded:----", "green"), json.loads(r))
-                    return  json.loads(r)
+                print(colored("Response from service:----", "green"), r)
+                print(colored("Response from service decoded:----", "green"), json.loads(r))
+                return  json.loads(r)
 
-                elif self.TYPE_REQUESTS == 'HTTP':
-                    print("---HTTP")
+            elif self.TYPE_REQUESTS == 'HTTP':
+                print("---HTTP")
 
-                    if method=='GET':
-                        r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
-                    elif method=='POST':
-                        r = requests.post(endpoint, data=params["parameters"].decode("utf-8"))
-                    elif method=='PUT':
-                        r = requests.put(endpoint, data=params["parameters"].decode("utf-8"))
-                    elif method=='DELETE':
-                        r = requests.delete(endpoint)
+                if method=='GET':
+                    r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
+                elif method=='POST':
+                    r = requests.post(endpoint, data=params["parameters"].decode("utf-8"))
+                elif method=='PUT':
+                    r = requests.put(endpoint, data=params["parameters"].decode("utf-8"))
+                elif method=='DELETE':
+                    r = requests.delete(endpoint)
 
-                    print(r)    
-                    data = r.json()
-                    print(data)
-                    print(colored("Response from service:----", "green"), r.json())
-                    return r.json()
-               
-                
-            except Exception as e:
+                print(r)    
+                data = r.json()
+                print(data)
+                print(colored("Response from service:----", "green"), r.json())
+                return r.json()
+                       
+        except Exception as e:
 
-                # TODO: catch specific exceptions
-                # QUESTION: why we need redis_key and what is this???
-                # result = redis_cache.incr(redis_key) # QUESTION cum incrementam daca redis_key e adresa, deci string??
+            nr_requests_failed = redis_cache.incr(self.get_redis_key())
 
-                nr_requests_failed +=1
-                print(colored("----Request failed:----", "red"))
-                print(e)
-                last_error = str(e)
+            print(colored("----Request failed:----", "red"), nr_requests_failed)
+            print(e)
 
-                # result = Cache.current.incr(redis_key)
+            last_error = str(e)
 
 
-
-        # TODO; check
-        # if result > 3: # de ce 3?
         if nr_requests_failed >= self.FAILURE_THRESHOLD:
             self.remove_from_cache(redis_cache)
             self.tripped = True
@@ -94,18 +81,16 @@ class CircuitBreaker:
 
         return {"status":"error", "message": "Request to service failed", "error":last_error}
 
+
     def clear(self, address):
         self.address = None
 
 
-
-    # QUESTION - asta e functie sau variabila/valoare & cum incrementam? why we need it?
-    def redis_key():
-        # TODO : check      
-        return "circuit_breaker" + self.address
+    def get_redis_key(self):
+        return "circuit_breaker:" + self.address.decode('utf-8')
 
 
     def remove_from_cache(self, redis_cache):
+        print(colored("Remove service from cache:", "yellow"), self.address)
         redis_cache.lrem("services-"+str(self.service_type), 1, self.address)
-        # redis_cache.delete("service:" + self.service_name)
-
+        redis_cache.delete(self.get_redis_key())
