@@ -1,6 +1,5 @@
 #!flask/bin/python
-from flask import Flask
-from flask import request, abort
+from flask import Flask, request, abort, Response
 import json
 import redis
 import requests
@@ -8,8 +7,10 @@ from termcolor import colored
 from jsonrpcserver import method, dispatch
 
 
+
 # json rpc documentation:
 # https://bcb.github.io/jsonrpc/flask
+# https://www.youtube.com/watch?time_continue=31&v=FmeyLUKHI4Q&feature=emb_logo
 
 app = Flask(__name__)
 
@@ -20,7 +21,7 @@ def ping():
 
 @method
 def init_student():
-    return {"message": "hello student!!!"}
+    return json.dumps({"message": "hello student!!!"})
 
 
 @app.route("/", methods=["POST"])

@@ -2,11 +2,13 @@ from errors_handling import CustomError, CustomError
 import requests
 from termcolor import colored
 from jsonrpcclient import request as rpc_request
+import json
 
 class CircuitBreaker:
     # FAILURE_THRESHOLD = 3
     FAILURE_THRESHOLD = 5
     TYPE_REQUESTS = 'RPC'
+    # TYPE_REQUESTS = 'HTTP'
 
     # def __init__(address, service_name):
     def __init__(self, address, service_type):
@@ -33,8 +35,14 @@ class CircuitBreaker:
         while nr_requests_failed < self.FAILURE_THRESHOLD:
             try:
                 if self.TYPE_REQUESTS == 'RPC':
-                    print("---RPC")
-                    r = rpc_request(str(self.address.decode("utf-8") ), str(params["path"]).replace("/", "").replace("-", "_")).data.result
+                    print(colored("---RPC", "blue"))
+                    route = str(params["path"]).replace("/", "")
+                    print("-> route:", route)
+                    r = rpc_request(str(self.address.decode("utf-8")), route).data.result
+
+                    print(colored("Response from service:----", "green"), r)
+                    print(colored("Response from service decoded:----", "green"), json.loads(r))
+                    return  json.loads(r)
 
                 elif self.TYPE_REQUESTS == 'HTTP':
                     print("---HTTP")

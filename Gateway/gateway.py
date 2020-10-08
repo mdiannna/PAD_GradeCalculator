@@ -46,13 +46,14 @@ def router(path):
  
 
     map_service_type_paths = {
-        "init-student" : "type1",
+        # "init-student" : "type1",
+        "init_student" : "type1",
         "nota" : "type1",
-        "nota-atestare" : "type1",
+        "nota_atestare" : "type1",
 
-        "nota-examen" : "type2",
-        "pune-nota-atestare" : "type2",
-        "nota-finala": "type2"
+        "nota_examen" : "type2",
+        "pune_nota_atestare" : "type2",
+        "nota_finala": "type2"
     }
 
     # allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2) ???  sau alta metoda???
@@ -144,7 +145,7 @@ def service_register():
         service_name = request.json["service_name"]
         service_address = request.json["address"]
         service_type = request.json["type"]
-        # TODO: add service type, and save as "service:servicetype:name"
+        # TODO: add service type, and save as "service:servicetype:name" ???
 
         print(colored("service name:", "red"), service_name)
         print(colored("service address:", "red"), service_address)
@@ -182,5 +183,5 @@ def get_registered_services():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
     
