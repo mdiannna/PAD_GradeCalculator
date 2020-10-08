@@ -45,4 +45,3 @@ Notite:
 https://martinfowler.com/bliki/CircuitBreaker.html
 - de verificat daca circuit breaker lucreaza ok, poate ar trebui daca un service e fail sa treaca la urmatorul si sa incrementeze in cache fail, apoi cand failuieste de mai mutle ori sa-l scoata din cache, nu deodata????
 - redis_key pentru ce totusi????
-- 2 circular lists pentru diferite service type
