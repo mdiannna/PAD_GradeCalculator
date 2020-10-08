@@ -106,6 +106,10 @@ def service_register():
         service_name = request.json["service_name"]
         service_address = request.json["address"]
         service_type = request.json["type"]
+
+        if service_type not in ["type1", "type2"]:
+            return {"status":"error", "message": "service_type should be type1 or type2"}
+
         # TODO: add service type, and save as "service:servicetype:name" ???
 
         print(colored("service name:", "red"), service_name)
@@ -114,7 +118,7 @@ def service_register():
         
         try:
             # redis_cache.set(str("service:" + service_name), str(service_ip))
-            redis_cache.lpush("services", service_address)
+            redis_cache.lpush("services-" + str(service_type), service_address)
             print("yes!")
             return {"status": "success", "message": "Service registered"}
         except:
@@ -136,11 +140,15 @@ def get_registered_services():
     #     result[key.decode()] = value.decode()
 
 
-    l = redis_cache.lrange('services', 0, -1)
-    result = [x for x in l]
+    l_type1 = redis_cache.lrange('services-type1', 0, -1)
+    l_type2 = redis_cache.lrange('services-type2', 0, -1)
+    
+    result_type1 = [x for x in l_type1]
+    result_type2 = [x for x in l_type2]
+
     # for x in l:
     #   print x
-    return {"registered_services": str(result)}
+    return {"registered_services-type1": str(result_type1), "registered_services-type2": str(result_type2)}
 
 
 if __name__ == '__main__':

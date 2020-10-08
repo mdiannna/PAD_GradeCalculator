@@ -106,6 +106,6 @@ class CircuitBreaker:
 
 
     def remove_from_cache(self, redis_cache):
-        redis_cache.lrem("services", 1, self.address)
+        redis_cache.lrem("services-"+str(self.service_type), 1, self.address)
         # redis_cache.delete("service:" + self.service_name)
 
