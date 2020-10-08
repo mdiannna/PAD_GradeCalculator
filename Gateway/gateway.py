@@ -31,32 +31,25 @@ def index():
     return "Hello!"
     
 
-# TODO: load balancer etc
 @app.route('/<path>', methods=['GET', 'POST'])
-def router(path):
-    """ algorithm:
-    0. Check if any services available
-    1. round robin or other algo - choose an ip from the services that is ready to take the request
-    2. use multiprocessing for this method
-    2.  Request to the respective ip service with multiprocessing (first http, them rpc)
-    3. Async get response"""
-    
-    # service_ip = "" #TODO: choose from registered services round robin or other more intelligent
-    # token = "SECRET_KEY"
- 
+def router(path):    
 
+    # NOTE: RPC works only with underscore(_) request, but new feature added that gateway can process both _ and - request, so we allow both
     map_service_type_paths = {
-        # "init-student" : "type1",
+        "init-student" : "type1",
         "init_student" : "type1",
         "nota" : "type1",
+        "nota-atestare" : "type1",
         "nota_atestare" : "type1",
 
+        "nota-examen" : "type2",
         "nota_examen" : "type2",
+        "pune-nota_atestare" : "type2",
         "pune_nota_atestare" : "type2",
+        "nota-finala": "type2",
         "nota_finala": "type2"
     }
 
-    # allowed_paths = ["test-service", "calc-midterm", "calc-semester"] #TODO: definit toate allowed path dupa tipurile de servicii (2) ???  sau alta metoda???
     allowed_paths = map_service_type_paths.keys()
 
     if path not in allowed_paths:
@@ -69,12 +62,6 @@ def router(path):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
         return abort(400, "No services available")
 
-    # # r = requests.get('https://api.github.com/mdiannna', auth=('user', 'pass'))
-    # r = requests.get(service_ip, token=token)
-    # print(r.status_code)
-    # print(r.headers['content-type'])
-    # print(r.text)
-    # print(r.json())
 
     parameters = {
         "path": request.path,
@@ -82,45 +69,19 @@ def router(path):
     }
 
 
-    # TODO: finish here    QUESTION
-    # response = LoadBalancer.next.request(parameters) #TODO python
     print(colored("parameters:", "magenta"), parameters)
 
     circuit_breaker = load_balancer.next(redis_cache, service_type)
     service_response = circuit_breaker.request(redis_cache, parameters, request.method)
-    # response = LoadBalancer.next(service_type).request(parameters) #TODO python
-
-    # response = LoadBalancer.next.request(
-    #     method:  request.request_method,
-    #     path:    request.path,
-    #     payload: request.body.read
-    #   )
-
+ 
     response = {'response':service_response, "service_type":service_type, "path":path}
-    # json(JSON.parse(response.body))
-    # return json.dumps(response)
+ 
     return response
 
 
 @app.route("/test-400")
 def test_400():
     abort(400)
-
-
-# # Example route request load balancing to the service
-# # @app.route("/nota-teorie/<NumeStudent>", methods=['GET', 'POST'])
-# @app.route("/nota-teorie/<NumeStudent>", methods=['POST'])
-# def nota_teorie(NumeStudent):
-#     # asta daca toate serviciile sunt la fel, noi insa vom avea 2 tipuri diferite de servicii!!!
-#     # result, status = Make request to load_balancer.next() + "/nota-teorie/" + NumeStudent
-#     status = "Error" # ???
-
-#     result = {
-#         "result": "Nota teorie test TODO: finish requests!!!",
-#         "status": status
-#     }
-
-#     return result
 
 
 # TODO: delete after testing and clear cache!
@@ -179,7 +140,7 @@ def get_registered_services():
     result = [x for x in l]
     # for x in l:
     #   print x
-    return str(result)
+    return {"registered_services": str(result)}
 
 
 if __name__ == '__main__':

@@ -5,9 +5,8 @@ from jsonrpcclient import request as rpc_request
 import json
 
 class CircuitBreaker:
-    # FAILURE_THRESHOLD = 3
     FAILURE_THRESHOLD = 5
-    TYPE_REQUESTS = 'RPC'
+    TYPE_REQUESTS = 'RPC'  # this can be 'RPC' or 'HTTP'
     # TYPE_REQUESTS = 'HTTP'
 
     # def __init__(address, service_name):
@@ -31,12 +30,13 @@ class CircuitBreaker:
         # rescue errno:ErrorConfused   ???? what is this  QUESTION
 
         nr_requests_failed = 0
+        last_error = ""
 
         while nr_requests_failed < self.FAILURE_THRESHOLD:
             try:
                 if self.TYPE_REQUESTS == 'RPC':
                     print(colored("---RPC", "blue"))
-                    route = str(params["path"]).replace("/", "")
+                    route = str(params["path"]).replace("/", "").replace("-", "_")
                     print("-> route:", route)
                     r = rpc_request(str(self.address.decode("utf-8")), route).data.result
 
@@ -71,6 +71,7 @@ class CircuitBreaker:
                 nr_requests_failed +=1
                 print(colored("----Request failed:----", "red"))
                 print(e)
+                last_error = str(e)
 
                 # result = Cache.current.incr(redis_key)
 
@@ -82,21 +83,19 @@ class CircuitBreaker:
             self.remove_from_cache(redis_cache)
             self.tripped = True
 
-        return {"status":"error", "message": "Request to service failed"}
+        return {"status":"error", "message": "Request to service failed", "error":last_error}
 
     def clear(self, address):
         self.address = None
 
 
 
-    # QUESTION - asta e functie sau variabila/valoare & cum incrementam?
+    # QUESTION - asta e functie sau variabila/valoare & cum incrementam? why we need it?
     def redis_key():
         # TODO : check      
         return "circuit_breaker" + self.address
 
 
-    # QUESTION - asta e functie sau variabila/valoare & cum incrementam?
-    # def remove_from_cache(self, redis_cache):
     def remove_from_cache(self, redis_cache):
         redis_cache.lrem("services", 1, self.address)
         # redis_cache.delete("service:" + self.service_name)

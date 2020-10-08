@@ -1,0 +1,85 @@
+
+import requests
+import json
+from termcolor import colored
+import pprint
+
+SERVER_ADDRESS = 'http://127.0.0.1:5000'
+pp = pprint.PrettyPrinter(indent=4)
+
+def make_request(method, endpoint, parameters):
+    if method=='GET':
+        r = requests.get(endpoint, params=parameters)
+    elif method=='POST':
+        r = requests.post(endpoint, data=parameters)
+    elif method=='PUT':
+        r = requests.put(endpoint, data=parameters)
+    elif method=='DELETE':
+        r = requests.delete(endpoint)
+
+
+def register_service(service_name, address, service_type):
+    endpoint = SERVER_ADDRESS + "/service-register"
+    parameters = {
+        "service_name": service_name,
+        "address": address,
+        "type": service_type
+    }
+    print(colored("-------REQUEST " + endpoint, "blue"))
+    print("parameters:", parameters)
+
+    try:
+        # r = requests.post(endpoint, data=parameters)
+        r = requests.post(endpoint, json=parameters)
+        print(colored("response:---", "green"))
+        pp.pprint(r.json())
+
+    except Exception as e:
+        print(colored("---error in request", "red"), e)
+
+    
+
+def request_init_student_dash(student_name, group):
+    # curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
+    endpoint = SERVER_ADDRESS + "/init-student"
+    parameters = {
+        "student_name": student_name,
+        "grupa": group
+    }
+    print(colored("-------REQUEST " + endpoint, "blue"))
+    print("parameters:", parameters)
+
+    try:
+        # r = requests.post(endpoint, data=parameters)
+        r = requests.post(endpoint, json=parameters)
+        print(colored("response:---", "green"))
+        pp.pprint(r.json())
+
+    except Exception as e:
+        print(colored("---error in request", "red"), e)
+
+
+def get_registered_services():
+    # curl  http://127.0.0.1:5000/registered-services
+
+    endpoint = SERVER_ADDRESS + "/registered-services"
+    print(colored("-------REQUEST " + endpoint, "blue"))
+
+    try:
+        r = requests.get(endpoint)
+        print(colored("response:---", "green"))
+        pp.pprint(r.json())
+    except Exception as e:
+        print(colored("---error in request", "red"), e)
+
+
+
+if __name__ == '__main__':
+    # HTTP:
+    # register_service("Service1", "http://127.0.0.1:6005/", "type1")
+    # register_service("Service1", "http://127.0.0.1:6004/", "type1")
+
+    # RPC:
+    register_service(service_name="ServiceRPC1_new", address="http://127.0.0.1:6003/", service_type="type1")
+    get_registered_services()
+    request_init_student_dash("Diana 1", "FAF-171")
