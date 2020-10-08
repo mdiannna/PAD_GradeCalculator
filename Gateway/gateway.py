@@ -7,8 +7,7 @@ import requests
 from loadbalancer import LoadBalancer
 from circuitbreaker import CircuitBreaker
 from termcolor import colored
-# from jsonrpcserver import method, dispatch
-# from jsonrpcclient import request as rpc_request
+
 
 app = Flask(__name__)
 
@@ -33,7 +32,6 @@ def index():
 
 @app.route('/<path>', methods=['GET', 'POST'])
 def router(path):    
-
     # NOTE: RPC works only with underscore(_) request, but new feature added that gateway can process both _ and - request, so we allow both
     map_service_type_paths = {
         "init-student" : "type1",
@@ -62,35 +60,18 @@ def router(path):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
         return abort(400, "No services available")
 
-
     parameters = {
         "path": request.path,
         "parameters": request.data
     }
 
-
     print(colored("parameters:", "magenta"), parameters)
 
     circuit_breaker = load_balancer.next(redis_cache, service_type)
     service_response = circuit_breaker.request(redis_cache, parameters, request.method)
+
  
-    # response = {'response':service_response, "service_type":service_type, "path":path} 
-    # return response
     return service_response
-
-
-@app.route("/test-400")
-def test_400():
-    abort(400)
-
-
-# TODO: delete after testing and clear cache!
-@app.route('/test-redis')
-def test_redis():
-    # redis_cache.set('foo', 'bar')
-
-    # return "Hello, World!" + str(redis_cache.get('foo'))
-    return "Hello, World! ------   "  + str(redis_cache.get('service:Service5'))
 
 
 @app.route('/service-register', methods=['GET', 'POST'])
@@ -110,16 +91,13 @@ def service_register():
         if service_type not in ["type1", "type2"]:
             return {"status":"error", "message": "service_type should be type1 or type2"}
 
-        # TODO: add service type, and save as "service:servicetype:name" ???
-
         print(colored("service name:", "red"), service_name)
         print(colored("service address:", "red"), service_address)
         print(colored("service type:", "red"), service_type)
         
         try:
-            # redis_cache.set(str("service:" + service_name), str(service_ip))
             redis_cache.lpush("services-" + str(service_type), service_address)
-            print("yes!")
+
             return {"status": "success", "message": "Service registered"}
         except:
             return {"status":"error", "message": "ERROR! Service not registered"}
@@ -133,22 +111,14 @@ def service_register():
 def get_registered_services():
     result = {}
 
-    # # TODO: add service type, and save as "service:servicetype:name"
-    # for key in redis_cache.scan_iter("service:*"):
-    #     value = redis_cache.get(key)
-    #     print(value)
-    #     result[key.decode()] = value.decode()
-
-
     l_type1 = redis_cache.lrange('services-type1', 0, -1)
     l_type2 = redis_cache.lrange('services-type2', 0, -1)
     
     result_type1 = [x for x in l_type1]
     result_type2 = [x for x in l_type2]
 
-    # for x in l:
-    #   print x
     return {"registered_services-type1": str(result_type1), "registered_services-type2": str(result_type2)}
+
 
 
 if __name__ == '__main__':

@@ -5,13 +5,13 @@ from jsonrpcclient import request as rpc_request
 import json
 from flask import abort
 
+
 class CircuitBreaker:
     FAILURE_THRESHOLD = 3
     # TYPE_REQUESTS = 'RPC'  # this can be 'RPC' or 'HTTP'
     TYPE_REQUESTS = 'HTTP'  # this can be 'RPC' or 'HTTP'
     # TYPE_REQUESTS = 'haha'  # should return error
 
-    # def __init__(address, service_name):
     def __init__(self, address, service_type):
         self.address = address
         self.tripped = False
@@ -33,13 +33,8 @@ class CircuitBreaker:
         endpoint = str(self.address.decode("utf-8") ) + str(params["path"]).replace("/", "")
         print(colored("service endpoint:---" + endpoint, "cyan"))
 
-        # RestClient::Request.execute(params.merge(url:endpoint))
-        # rescue errno:ErrorConfused   ???? what is this  QUESTION
-
-        # nr_requests_failed = 0
         last_error = ""
 
-        # while nr_requests_failed < self.FAILURE_THRESHOLD:
         try:
             if self.TYPE_REQUESTS == 'RPC':
                 print(colored("---RPC", "blue"))
@@ -68,28 +63,17 @@ class CircuitBreaker:
                 print(data)
                 print(colored("Response from service:----", "green"), r.json())
                 return r.json()
-           
-            
+                       
         except Exception as e:
+
             nr_requests_failed = redis_cache.incr(self.get_redis_key())
 
-
-
-            # TODO: catch specific exceptions
-            # QUESTION: why we need redis_key and what is this???
-            # result = redis_cache.incr(redis_key) # QUESTION cum incrementam daca redis_key e adresa, deci string??
-
-            # nr_requests_failed +=1
             print(colored("----Request failed:----", "red"), nr_requests_failed)
             print(e)
+
             last_error = str(e)
 
-            # result = Cache.current.incr(redis_key)
 
-
-
-        # TODO; check
-        # if result > 3: # de ce 3?
         if nr_requests_failed >= self.FAILURE_THRESHOLD:
             self.remove_from_cache(redis_cache)
             self.tripped = True
@@ -97,14 +81,12 @@ class CircuitBreaker:
 
         return {"status":"error", "message": "Request to service failed", "error":last_error}
 
+
     def clear(self, address):
         self.address = None
 
 
-
-    # QUESTION - asta e functie sau variabila/valoare & cum incrementam? why we need it?
     def get_redis_key(self):
-        # TODO : check      
         return "circuit_breaker:" + self.address.decode('utf-8')
 
 
@@ -112,5 +94,3 @@ class CircuitBreaker:
         print(colored("Remove service from cache:", "yellow"), self.address)
         redis_cache.lrem("services-"+str(self.service_type), 1, self.address)
         redis_cache.delete(self.get_redis_key())
-        # redis_cache.delete("service:" + self.service_name)
-
