@@ -41,7 +41,8 @@ def register_service(service_name, address, service_type):
 
 def request_init_student_dash(student_name, group):
     # curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
-    endpoint = SERVER_ADDRESS + "/init-student"
+    # endpoint = SERVER_ADDRESS + "/init-student"
+    endpoint = SERVER_ADDRESS + "/init_student"
     parameters = {
         "student_name": student_name,
         "grupa": group
@@ -74,12 +75,25 @@ def get_registered_services():
 
 
 
-if __name__ == '__main__':
-    # HTTP:
-    # register_service("Service1", "http://127.0.0.1:6005/", "type1")
-    # register_service("Service1", "http://127.0.0.1:6004/", "type1")
-
-    # RPC:
+# do not forget to change parameter to 'RPC' in circuitbreaker!
+def test_gateway_rpc():
     register_service(service_name="ServiceRPC1_new", address="http://127.0.0.1:6003/", service_type="type1")
     get_registered_services()
     request_init_student_dash("Diana 1", "FAF-171")
+
+
+# do not forget to change parameter to 'HTTP' in circuitbreaker!
+def test_gateway_http():
+    # register_service("Service1", "http://127.0.0.1:6005/", "type1")
+    # register_service("Service1", "http://127.0.0.1:6004/", "type1")
+
+    register_service(service_name="Service1", address="http://127.0.0.1:6005/", service_type="type1")
+    get_registered_services()
+    request_init_student_dash("Diana 2", "FAF-171")
+
+if __name__ == '__main__':
+    # HTTP:
+    # test_gateway_http()
+
+    # RPC:
+    test_gateway_rpc()

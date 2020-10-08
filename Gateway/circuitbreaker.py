@@ -7,7 +7,7 @@ import json
 class CircuitBreaker:
     FAILURE_THRESHOLD = 5
     TYPE_REQUESTS = 'RPC'  # this can be 'RPC' or 'HTTP'
-    # TYPE_REQUESTS = 'HTTP'
+    # TYPE_REQUESTS = 'HTTP'  # this can be 'RPC' or 'HTTP'
 
     # def __init__(address, service_name):
     def __init__(self, address, service_type):
