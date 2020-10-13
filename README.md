@@ -19,3 +19,12 @@
 
 #### Request register service: (de la servicii spre gateway)
 - `POST /service-register cu parametrii {“service_name”, “ip”, “type”} (type poate sa fie type1 sau type2)`
+
+
+## Docker
+Commands to run gateway in docker:
+(use sudo if needed)
+
+from folder Gateway:
+`$docker build -t flask-gateway .`
+`$docker-compose up`
