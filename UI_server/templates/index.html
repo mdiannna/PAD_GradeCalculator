@@ -8,6 +8,7 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="{{url_for('static', filename='js/index.js')}}"></script>
 
       <style type="text/css">
         .mint-color {
@@ -46,35 +47,93 @@
   <!-- <h1>Hello!</h1> -->
 
 <ul class="nav nav-tabs">
+  
   <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#home">Put mark</a>
+    <a class="nav-link active" data-toggle="tab" href="#add_student_to_list">Add student to list</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#home">Put mark</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#profile">Get student calculated mark</a>
   </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#students_list">Students list</a>
+  </li>
 </ul>
 
 
+
 <div id="myTabContent" class="tab-content">
-  <div class="tab-pane fade active show" id="home">
+  <div class="tab-pane fade active show pt-3 pb-3" id="add_student_to_list">
+    <!-- TODO: add students to local storage -->
 
     <form>
       <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        <label>Student name</label>
+        <input type="text" class="form-control" placeholder="Student name" id="nume_prenume_add_student">
       </div>
       <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        <label>Student group</label>
+        <input type="text" class="form-control" placeholder="Student group" id="grupa_add_student">
       </div>
+      
+      <button class="btn btn-secondary" onclick="add_student()">Submit</button>
+
+    </form>
+  </div>
+
+  <div class="tab-pane fade  pt-3 pb-3" id="home">
+
+    <form>
+      <div class="form-group">
+        <label >Student name</label>
+        <input type="text" class="form-control"  aria-describedby="textHelp" placeholder="Enter text">
+      </div>
+      <div class="row">
+        <div class="col-md-4 form-group">
+          <label>Select type (teorie/practica)</label>
+          <select class="select form-control">
+            <option>teorie</option>
+            <option>practica</option>
+          </select>  
+        </div>
+        <div class="col-md-4 form-group">
+          <label>Nr atestare</label>
+          <input type="" name="" placeholder="Nr atestare" class="form-control">
+        </div>
+        <div class="col-md-4 form-group">
+          <label>Nota atestare</label>
+          <input type="" name="" placeholder="Nota atestare" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label >Nota examen</label>
+        <input type="text" class="form-control"  aria-describedby="textHelp" placeholder="Nota examen">
+      </div>
+      
+
 
       <button type="submit" class="btn btn-secondary">Submit</button>
     </form>
   </div>
 
   <div class="tab-pane fade" id="profile">
-    <p>sdfsdf</p>
+    <label>Select student</label>
+    <select id="students_list_select" class="form-control">
+      <option>-</option>
+    </select>
+    <br>
+    <p><b>Nota atestare1:</b> 10</p>
+    <p><b>Nota atestare2:</b> 10</p>
+    <p><b>Nota examen:</b> 10</p>
+  </div>
+
+  <div class="tab-pane fade" id="students_list">
+    <div id="students_list_div">List of students empty</div>
+
+    <!-- TODO: show students list from local storage -->
   </div>
 
 </div>
