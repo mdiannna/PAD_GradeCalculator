@@ -1,0 +1,19 @@
+version: '3'
+services:
+
+  flask-gateway:
+    image: "flask-gateway"
+    container_name: flask-gateway
+    ports:
+      - "5000:5000"
+
+  redis:
+    container_name: cache
+    image: "redis:alpine"
+    restart: always
+    ports:
+      - '6379:6379'
+    expose:
+      - 6379
+    environment:
+      - REDIS_URL=redis://cache

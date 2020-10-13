@@ -22,7 +22,8 @@ app = Flask(__name__)
 
 
 # TODO -- QUESTION: why id doesn't clear when running the server??
-redis_cache = redis.Redis(host='localhost', port=6379, db=0)
+# redis_cache = redis.Redis(host='localhost', port=6379, db=0)
+redis_cache = redis.Redis(host='172.18.0.1', port=6379, db=0)
 load_balancer = LoadBalancer()
 
 @app.route('/')
@@ -122,5 +123,5 @@ def get_registered_services():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5000)
     

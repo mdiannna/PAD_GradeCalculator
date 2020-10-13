@@ -37,3 +37,15 @@ curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: appl
 curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
 curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/init_student
 
+
+
+
+
+
+Docker:
+sudo docker build -t flask-gateway .
+sudo docker run --name gateway -p 5000:5000 flask-gateway
+
+
+
+sudo service redis stop
