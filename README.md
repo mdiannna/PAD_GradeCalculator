@@ -26,5 +26,7 @@ Commands to run gateway in docker:
 (use sudo if needed)
 
 from folder Gateway:
+
 `$docker build -t flask-gateway .`
+
 `$docker-compose up`
