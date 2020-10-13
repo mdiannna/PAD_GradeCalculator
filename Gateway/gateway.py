@@ -31,7 +31,7 @@ load_balancer = LoadBalancer()
 @app.route('/')
 def index():
     return "Hello!"
-    
+
 
 @app.route('/<path>', methods=['GET', 'POST'])
 def router(path):    
