@@ -1,6 +1,6 @@
 from python:3.7-alpine
 WORKDIR /
-
+ENV LANG=en_US.UTF-8
 
 EXPOSE 5000
 
