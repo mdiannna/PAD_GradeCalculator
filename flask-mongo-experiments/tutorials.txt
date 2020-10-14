@@ -1,0 +1,1 @@
+https://kb.objectrocket.com/elasticsearch/how-to-setup-a-mongodb-app-using-the-flask-framework-557
