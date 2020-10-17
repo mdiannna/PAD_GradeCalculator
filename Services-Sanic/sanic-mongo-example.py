@@ -11,6 +11,7 @@ from sanic_motor import BaseModel
 app = Sanic(__name__)
 
 # https://github.com/lixxu/sanic-motor
+# https://github.com/lixxu/sanic-motor/blob/master/example/myapp.py
 
 # "mongodb://127.0.0.1:27017"
 settings = dict(MOTOR_URI='mongodb://localhost:27017/service-mongo-test',
@@ -35,7 +36,6 @@ async def index(request):
 
 
 # curl -d '{"name":"Diana Marusic", "age": "22"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/new
-
 
 # @app.route("/new", methods=("GET", "POST"))
 @app.route("/new", methods=["POST"])
