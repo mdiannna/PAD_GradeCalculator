@@ -1,0 +1,42 @@
+"exam_marks":
+[
+	{
+		"id" : "1",
+		"student": "NumePrenume",
+		"mark": 10,
+		"status": "processing"
+	},
+	{
+		"id" : "2",
+		"student": "NumePrenume2",
+		"mark": 9,
+		"status": "finished"
+	},
+]
+
+
+
+"midterm_marks": 
+[
+	{
+		"id" : "1",
+		"student": "NumePrenume",
+		"mark": 10,
+		"midterm_nr": 1,
+		"status": "processing",
+	},
+	{
+		"id" : "2",
+		"student": "NumePrenume2",
+		"mark": 9,
+		"midterm_nr": 1,
+		"status": "processing",
+	},
+	{
+		"id" : "3",
+		"student": "NumePrenume1",
+		"mark": 9,
+		"midterm_nr": 2,
+		"status": "finished",
+	},
+]
