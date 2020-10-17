@@ -1,0 +1,12 @@
+curl -X GET \
+      -H "content-type: application/json" \
+      -H "Accept: application/json" \
+      -d '{"student":"Diana Marusic"}' \
+      "http://127.0.0.1:8000/nota-examen"
+
+
+curl -X GET \
+      -H "content-type: application/json" \
+      -H "Accept: application/json" \
+      -d '{"student":"Diana Marusic"}' \
+      "http://127.0.0.1:8000/nota-finala"
