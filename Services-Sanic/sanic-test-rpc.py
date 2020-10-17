@@ -3,6 +3,9 @@ from sanic_jsonrpc import SanicJsonrpc
 from sanic import response
 import json
 
+# documentation:
+# https://pypi.org/project/sanic-jsonrpc/
+
 app = Sanic('server')
 # jsonrpc = SanicJsonrpc(app, post_route='/api/rpc/post', ws_route='/api/rpc/ws')
 jsonrpc = SanicJsonrpc(app, post_route='/', ws_route='/api/rpc/ws')
