@@ -53,8 +53,8 @@ async def nota_examen(request):
     
     # curl -d '{"student":"Diana Marusic", "nota": "10"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/nota-examen
     if request.method=='POST':
-        student = request.json.get("student", "")
-        nota = request.json.get("nota", "")
+        student = request.args.get("student", "")
+        nota = request.args.get("nota", "")
 
         is_uniq = await ExamMark.is_unique(doc=dict(student=student))
         
@@ -80,7 +80,7 @@ async def nota_examen(request):
         print(request.json)
         print(colored("-------:", "blue"))
 
-        student = request.json.get("student", "")        
+        student = request.args.get("student", "")        
 
         # exam_mark = await ExamMark.find_one({"student":student}, as_raw=True)
         exam_mark = await ExamMark.find_one({"student":student})
@@ -107,9 +107,10 @@ async def nota_atestare(request):
     print(colored("-------:", "blue"))
 
     if request.method=="POST":
-        student = request.json.get("student", "")
-        nota = request.json.get("nota", "")
-        nr_atestare = int(request.json.get("nr_atestare", ""))
+        # student = request.json.get("student", "")
+        student = request.args.get("student", "")
+        nota = request.args.get("nota", "")
+        nr_atestare = int(request.args.get("nr_atestare", ""))
 
         is_uniq = await MidtermMark.is_unique(doc=dict(student=student, midterm_nr=nr_atestare))
         
@@ -136,8 +137,8 @@ async def nota_atestare(request):
       "http://127.0.0.1:8000/nota-examen"
       """
 
-        student = request.json.get("student", "")        
-        nr_atestare = int(request.json.get("nr_atestare", ""))
+        student = request.args.get("student", "")        
+        nr_atestare = int(request.args.get("nr_atestare", ""))
 
         # exam_mark = await ExamMark.find_one({"student":student}, as_raw=True)
         # midterm_mark = await MidtermMark.find_one({"student":student, "midterm_nr": nr_atestare})
@@ -162,7 +163,7 @@ async def nota_atestare(request):
 
 @app.route("/nota-finala", methods=["GET"])
 async def get_nota_finala(request):
-    student = request.json.get("student", "")
+    student = request.args.get("student", "")
     
     print(colored("Student:" + str(student), "yellow"))
     # midterm_marks = await MidtermMark.find({"student":student})
@@ -246,8 +247,8 @@ async def nota_atestare(request):
     print(colored("-------:", "blue"))
 
     if request.method=="POST":
-        student = request.json.get("student", "")
-        ttype = request.json.get("tip", "") # poate fi "examen" sau "atestare"
+        student = request.args.get("student", "")
+        ttype = request.args.get("tip", "") # poate fi "examen" sau "atestare"
 
         if ttype == "examen":
             try:
