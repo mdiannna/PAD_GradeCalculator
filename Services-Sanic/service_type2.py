@@ -19,6 +19,10 @@ from sanic_motor import BaseModel
 from models import ExamMark, MidtermMark
 from termcolor import colored
 
+from sanic_jsonrpc import SanicJsonrpc
+import json
+
+
 app = Sanic(__name__)
 
 # documentation:
@@ -36,6 +40,7 @@ app.config.update(settings)
 
 BaseModel.init_app(app)
 jinja = SanicJinja2(app, autoescape=True)
+jsonrpc = SanicJsonrpc(app, post_route='/rpc', ws_route='/api/rpc/ws')
 
 
 @app.route('/')
@@ -108,7 +113,10 @@ async def nota_atestare(request):
 
         is_uniq = await MidtermMark.is_unique(doc=dict(student=student, midterm_nr=nr_atestare))
         
-        if is_uniq in (True, None):
+        midterm_mark = await MidtermMark.find_one(filter={"midterm_nr":nr_atestare, "student":student})
+
+        # if is_uniq in (True, None):
+        if not midterm_mark:
             try:
                 await MidtermMark.insert_one(dict(student=student, mark=int(nota), midterm_nr=nr_atestare, status="processing"))
 
@@ -134,7 +142,7 @@ async def nota_atestare(request):
         # exam_mark = await ExamMark.find_one({"student":student}, as_raw=True)
         # midterm_mark = await MidtermMark.find_one({"student":student, "midterm_nr": nr_atestare})
         # midterm_mark = await MidtermMark.find_one({"student":student})
-        midterm_mark = await MidtermMark.find_one(filter={"midterm_nr":nr_atestare})
+        midterm_mark = await MidtermMark.find_one(filter={"midterm_nr":nr_atestare, "student":student})
         print(colored("midterm mark:", "yellow"), midterm_mark)   
 
         if midterm_mark:
@@ -161,12 +169,30 @@ async def get_nota_finala(request):
     # midterm_marks = await MidtermMark.find({"student":student})
 
     try:
-        midterm_marks_cursor = await MidtermMark.find({"student":student})
-        # midterm_marks = await midterm_marks_cursor.to_list()
+        # cursor_marks = await MidtermMark.find({"student":student})
+        cursor_marks = await MidtermMark.find(sort='student')
+        
+        marks = cursor_marks.objects
+        print("marks", marks)
+        results = []
+        for obj in marks:
+            if obj.student == student:
+                results.append(int(obj.mark))
 
-        midterm_marks = midterm_marks.to_list()
+        print("results", results)
+        # midterm_marks_cursor = await MidtermMark.find({"student":student})
+        # # midterm_marks = await midterm_marks_cursor.to_list()
+
+        # midterm_marks_cursor = midterm_marks_cursor.objects
+        # midterm_marks = [] 
+
+        # for obj in midterm_marks_cursor:
+        #     midterm_marks.append(obj.mark)
+        midterm_marks = results
+
         # TODO: finish
-    except:
+    except Exception as e:
+        print(colored("ERROR!", "red"), e)
         print(colored("--Error!-- No midterm marks found for student " + student, "red"))
         return response.json({"status": "error", "message":"--Error!-- No midterm marks found for student " + student})
 
@@ -188,7 +214,7 @@ async def get_nota_finala(request):
     PERCENTAGE_EXAM = 40
     
     if exam_mark and midterm_marks and (len(midterm_marks) == NR_MIDTERMS):
-        final_mark = PERCENTAGE_EXAM / 100.0 * exam_mark + PERCENTAGE_M1 * midterm_marks[0] + PERCENTAGE_M2 * midterm_marks[1]
+        final_mark = PERCENTAGE_EXAM / 100.0 * exam_mark + PERCENTAGE_M1/100.00 * midterm_marks[0] + PERCENTAGE_M2/100.00 * midterm_marks[1]
 
         return response.json({
             "status": "success", 
@@ -209,7 +235,6 @@ async def get_nota_finala(request):
 
     return response.json({"status": "unknown", "message": "Something went wrong"})
     
-
 
 @app.route("/s2-validate-student-marks", methods=["POST"])
 async def nota_atestare(request):
@@ -292,6 +317,89 @@ async def get_all_exam_marks(request):
 # curl -X GET   -H "content-type: application/json" -H "Accept: application/json"  "http://127.0.0.1:8000/get-all-midterm-marks"
 @app.route('/get-all-midterm-marks')
 async def get_all_midterm_marks(request):
+    try:    
+        cursor_marks = await MidtermMark.find(sort='student')
+        marks = cursor_marks.objects
+        
+        results = {}
+        for obj in marks:
+            results[obj.student] = {"midterm_nr": obj.midterm_nr, "mark": obj.mark}
+
+        return response.json({"status": "success", "results":results})
+    except:
+        return response.json({"status": "error", "message": "Something went wrong"})
+    return response.json({"status": "unknown", "message": "Something went wrong"})
+
+
+
+########################################
+# RPC
+########################################
+
+# TODO: replace all response.json to to json dumps!!!
+@jsonrpc
+async def get_nota_examen(student):
+    pass
+    # TODO
+    
+@jsonrpc
+async def post_nota_examen(student, nota):
+    pass
+    # TODO
+    
+@jsonrpc
+async def s2_get_nota_atestare(student, nr_atestare):
+    pass
+    # TODO
+    
+@jsonrpc
+async def s2_post_nota_atestare(student, nota, nr_atestare):
+    pass
+    # TODO
+    
+@jsonrpc
+async def nota_finala(student):
+    pass
+    # TODO
+    
+@jsonrpc
+async def s2_validate_student_marks(student, tip):
+    pass
+    # TODO
+
+@jsonrpc
+async def status():
+    try:
+        nr_midterm_marks_processing = await MidtermMark.count_documents({'status': "processing"})
+        nr_exam_marks_processing = await ExamMark.count_documents({'status': "processing"})
+        return response.json({
+            "status": "success", 
+            "nr_midterm_marks_processing":nr_midterm_marks_processing, 
+            "nr_exam_marks_processing": nr_exam_marks_processing, 
+            "total_processing": nr_midterm_marks_processing + nr_exam_marks_processing
+            })
+    except:
+        return response.json({"status": "error", "message": "Something went wrong"})
+
+    return response.json({"status": "unknown", "message": "Something went wrong"})
+
+@jsonrpc
+async def get_all_exam_marks():
+    try:    
+        cursor_marks = await ExamMark.find(sort='student')
+        marks = cursor_marks.objects
+        
+        results = {}
+        for obj in marks:
+            results[obj.student] = obj.mark
+
+        return response.json({"status": "success", "results":results})
+    except:
+        return response.json({"status": "error", "message": "Something went wrong"})
+    return response.json({"status": "unknown", "message": "Something went wrong"})
+
+@jsonrpc
+async def get_all_midterm_marks():
     try:    
         cursor_marks = await MidtermMark.find(sort='student')
         marks = cursor_marks.objects

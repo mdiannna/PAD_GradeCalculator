@@ -225,7 +225,7 @@ if __name__ == '__main__':
     # print("-----------")
     test_post_midterm_mark(midterm_nr=1)
     test_post_midterm_mark(midterm_nr=2)
-    test_post_midterm_mark(midterm_nr=3)
+    # test_post_midterm_mark(midterm_nr=3)
 
     get_all_midterm_marks()
     # print("-----------")

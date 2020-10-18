@@ -29,6 +29,8 @@ class ExamMark(BaseModel):
 
 class MidtermMark(BaseModel):
     __coll__ = 'midterm_marks'
+    # __unique_fields__ = ['student', 'midterm_nr']
+
 
 
 
