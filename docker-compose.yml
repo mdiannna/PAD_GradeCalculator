@@ -35,4 +35,18 @@ services:
     expose: [8000]
     links:
       - db-mongo
-    
+  service-csharp-1:
+    image: csharp-service1:latest
+    container_name: csharp-s1
+    ports:
+      - 50757:50757
+    expose:
+      - 50757
+    depends_on:
+      - sqldb
+  sqldb:
+      container_name: sqldb
+      image: "mcr.microsoft.com/mssql/server"
+      environment:
+          SA_PASSWORD: "Your_password123"
+          ACCEPT_EULA: "Y"
