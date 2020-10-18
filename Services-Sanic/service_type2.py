@@ -33,7 +33,12 @@ app = Sanic(__name__)
 # https://www.tutorialkart.com/mongodb/mongodb-delete-database/
 
 # "mongodb://127.0.0.1:27017"
-settings = dict(MOTOR_URI='mongodb://localhost:27017/service2-mongo-students',
+# settings = dict(MOTOR_URI='mongodb://localhost:27017/service2-mongo-students',
+#                 LOGO=None,
+#                 )
+# ca sa ruleze in docker pe alt port:
+# settings = dict(MOTOR_URI='mongodb://localhost:27018/service2-mongo-students',
+settings = dict(MOTOR_URI='mongodb://db-mongo:27018/service2-mongo-students',
                 LOGO=None,
                 )
 app.config.update(settings)

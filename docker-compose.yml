@@ -15,4 +15,24 @@ services:
     ports:
       - 5000:5000
     expose: [5000]
-  
+    depends_on:
+      - redis
+  db-mongo:
+    image: mongo:latest
+    container_name: db-mongo
+    environment:
+      - MONGO_INITDB_DATABASE=service2-mongo-students
+    ports:
+      - 27018:27018
+    command: mongod --port 27018
+    expose:
+      - 27018
+  service-sanic2:
+    image: service-sanic2:latest
+    container_name: service-s2
+    ports:
+      - 8000:8000
+    expose: [8000]
+    links:
+      - db-mongo
+    

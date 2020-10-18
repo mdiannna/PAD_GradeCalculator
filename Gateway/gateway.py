@@ -26,8 +26,8 @@ app = Flask(__name__)
 
 # redis_cache = redis.Redis(host='172.18.0.1', port=6379, db=0)
 # for docker:
-# redis_cache = redis.Redis(host='redis', port=6379, db=0)
-redis_cache = redis.Redis(host='localhost', port=6379, db=0)
+redis_cache = redis.Redis(host='redis', port=6379, db=0)
+# redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 load_balancer = LoadBalancer()
 
 @app.route('/')

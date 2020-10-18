@@ -41,12 +41,16 @@ curl -d '{"student":"Diana Marusic", "grupa": "FAF-171"}' -H 'Content-Type: appl
 
 
 
+$ docker pull mongo:latest
+https://medium.com/faun/managing-mongodb-on-docker-with-docker-compose-26bf8a0bbae3
 
 Docker:
 sudo docker build -t flask-gateway .
 sudo docker run --name gateway -p 5000:5000 flask-gateway
 
 
+
+sudo docker build -t service-sanic2 .
 
 sudo service redis stop
 
@@ -69,3 +73,10 @@ curl -d '{"service_name": "Service-Sanic2", "address": "http://192.168.0.20:8000
 start redis:
 $ sudo systemctl start redis
 $ din app.py alege la redis host sa fie localhost
+
+
+
+
+curl -d '{"service_name": "Service-Sanic2", "address": "http://192.168.0.20:8000/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register
+
+curl -X GET   http://127.0.0.1:5000/nota-finala?student=Diana
