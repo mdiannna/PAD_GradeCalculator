@@ -80,3 +80,26 @@ $ din app.py alege la redis host sa fie localhost
 curl -d '{"service_name": "Service-Sanic2", "address": "http://192.168.0.20:8000/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register
 
 curl -X GET   http://127.0.0.1:5000/nota-finala?student=Diana
+
+
+
+// register from docker
+curl -d '{"service_name": "Service-Sanic2", "address": "http://service-s2:8000/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register
+
+
+
+
+
+
+
+workflow:
+$ sudo service redis stop
+$ cd Gateway
+$ sudo docker build -t flask-gateway .
+$ cd ../Services-Sanic
+$ sudo docker build -t service-sanic2 .
+$ sudo docker-compose up
+$ curl -d '{"service_name": "Service-Sanic2", "address": "http://service-s2:8000/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register
+
+se poate de testat
+$ python Services-Sanic/test_service.py

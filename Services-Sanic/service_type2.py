@@ -58,8 +58,11 @@ async def nota_examen(request):
     
     # curl -d '{"student":"Diana Marusic", "nota": "10"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/nota-examen
     if request.method=='POST':
-        student = request.args.get("student", "")
-        nota = request.args.get("nota", "")
+        # student = request.args.get("student", "")
+        # nota = request.args.get("nota", "")
+
+        student = request.json.get("student", "")
+        nota = request.json.get("nota", "")
 
         is_uniq = await ExamMark.is_unique(doc=dict(student=student))
         

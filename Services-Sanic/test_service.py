@@ -4,9 +4,16 @@ import json
 from termcolor import colored
 import pprint
 
-# SERVICE_ADDRESS = 'http://127.0.0.1:8000'
-# going through gateway
-SERVICE_ADDRESS = 'http://127.0.0.1:5000'
+
+TEST_WITH_GATEWAY = True
+# TEST_WITH_GATEWAY = False
+SERVICE_ADDRESS = 'http://127.0.0.1:8000'
+
+if TEST_WITH_GATEWAY==True:
+    # going through gateway
+    SERVICE_ADDRESS = 'http://127.0.0.1:5000'
+
+
 pp = pprint.PrettyPrinter(indent=4)
 
 def make_request(method, endpoint, parameters):
@@ -27,7 +34,7 @@ def post_exam_mark():
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     parameters = {
-        "student": "Lorem Ipsum",
+        "student": "Student Test3",
         "nota": 9
     }    
 
@@ -71,7 +78,7 @@ def get_exam_mark():
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     parameters = {
-        "student": "Lorem Ipsum",
+        "student": "Student Test3",
     }    
 
     print("parameters:",parameters)
@@ -95,7 +102,7 @@ def test_get_midterm_mark(existing=True):
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     parameters = {
-        "student": "Lorem Ipsum",
+        "student": "Student Test3",
         "nr_atestare": 1
     }   
      #if want to test not found mark 
@@ -123,7 +130,7 @@ def test_post_midterm_mark(midterm_nr=1):
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     parameters = {
-        "student": "Lorem Ipsum",
+        "student": "Student Test3",
         "nota" : 7,
         "nr_atestare":midterm_nr
     }    
@@ -150,7 +157,7 @@ def get_all_midterm_marks():
 
     try:
         # #r = requests.post(endpoint, data=json.dumps(parameters))
-        r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.post(endpoint, data=json.dumps(parameters))
         r = requests.get(endpoint)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
@@ -167,7 +174,7 @@ def get_final_mark():
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     parameters = {
-        "student": "Lorem Ipsum",
+        "student": "Student Test3",
     }   
 
     print("parameters:",parameters)
@@ -186,6 +193,9 @@ def get_final_mark():
 
 def get_status():
     endpoint = SERVICE_ADDRESS + "/status"
+    if TEST_WITH_GATEWAY==True:
+        endpoint = SERVICE_ADDRESS + "/s2-status"
+
 
     print(colored("-------REQUEST " + endpoint, "blue"))
 
@@ -207,7 +217,7 @@ def test_validate_marks(ttype):
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     parameters = {
-        "student": "Lorem Ipsum",
+        "student": "Student Test3",
         "tip": ttype
     }   
 
@@ -233,13 +243,13 @@ def test_validate_midterm_marks():
     test_validate_marks(ttype="atestare")
 
 if __name__ == '__main__':
-    # post_exam_mark()
+    post_exam_mark()
     get_all_exam_marks()
     get_exam_mark()
     # print("-----------")
     test_post_midterm_mark(midterm_nr=1)
     test_post_midterm_mark(midterm_nr=2)
-    test_post_midterm_mark(midterm_nr=3)
+    # test_post_midterm_mark(midterm_nr=3)
 
     get_all_midterm_marks()
     # print("-----------")
