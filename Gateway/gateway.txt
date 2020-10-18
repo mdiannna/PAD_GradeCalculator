@@ -49,3 +49,23 @@ sudo docker run --name gateway -p 5000:5000 flask-gateway
 
 
 sudo service redis stop
+
+
+
+
+curl -d '{"service_name": "Service-Sanic2", "address": "http://192.168.0.20:8000/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register
+
+# curl -d '{"student":"Diana Marusic"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/nota_finala
+
+  curl -X GET \
+      -H "content-type: application/json" \
+      -H "Accept: application/json" \
+      -d '{"student":"Diana Marusic"}' \
+      "http://127.0.0.1:5000/nota-finala"
+
+
+
+### RUnning on local:
+start redis:
+$ sudo systemctl start redis
+$ din app.py alege la redis host sa fie localhost

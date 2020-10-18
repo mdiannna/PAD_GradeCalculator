@@ -10,3 +10,6 @@ curl -X GET \
       -H "Accept: application/json" \
       -d '{"student":"Diana Marusic"}' \
       "http://127.0.0.1:8000/nota-finala"
+
+!!! ca sa mearga trebuie de facut requesturi cu curl asa pentru get:
+curl -X GET   http://127.0.0.1:5000/nota-finala?student=Diana

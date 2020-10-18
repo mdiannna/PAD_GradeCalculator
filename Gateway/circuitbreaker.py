@@ -50,11 +50,14 @@ class CircuitBreaker:
                 print("---HTTP")
 
                 if method=='GET':
-                    r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
+                    # r = requests.get(endpoint, params=params["parameters"].decode("utf-8"))
+                    r = requests.get(endpoint, params=params["parameters"])
                 elif method=='POST':
-                    r = requests.post(endpoint, data=params["parameters"].decode("utf-8"))
+                    # r = requests.post(endpoint, data=params["parameters"].decode("utf-8"), json=params["parameters"].decode("utf-8"))
+                    r = requests.post(endpoint, data=params["parameters"], json=params["parameters"])
                 elif method=='PUT':
-                    r = requests.put(endpoint, data=params["parameters"].decode("utf-8"))
+                    # r = requests.put(endpoint, data=params["parameters"].decode("utf-8"), json=params["parameters"].decode("utf-8"))
+                    r = requests.put(endpoint, data=params["parameters"], json=params["parameters"])
                 elif method=='DELETE':
                     r = requests.delete(endpoint)
 

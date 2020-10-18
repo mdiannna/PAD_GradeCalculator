@@ -232,7 +232,7 @@ def test_validate_midterm_marks():
 
 if __name__ == '__main__':
     # # post_exam_mark()
-    # get_all_exam_marks()
+    get_all_exam_marks()
     # get_exam_mark()
     # # print("-----------")
     # test_post_midterm_mark(midterm_nr=1)
@@ -241,7 +241,7 @@ if __name__ == '__main__':
 
     # get_all_midterm_marks()
     # # print("-----------")
-    # test_get_midterm_mark()
+    test_get_midterm_mark()
 
     # test_get_midterm_mark(existing=False) #shoudl return "no marks found"
 

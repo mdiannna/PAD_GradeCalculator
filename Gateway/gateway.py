@@ -25,7 +25,9 @@ app = Flask(__name__)
 # redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 
 # redis_cache = redis.Redis(host='172.18.0.1', port=6379, db=0)
-redis_cache = redis.Redis(host='redis', port=6379, db=0)
+# for docker:
+# redis_cache = redis.Redis(host='redis', port=6379, db=0)
+redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 load_balancer = LoadBalancer()
 
 @app.route('/')
@@ -63,9 +65,19 @@ def router(path):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
         return abort(400, "No services available")
 
+    if request.method == 'GET':
+        data = request.args
+    elif request.method == 'POST':
+        data = request.data
+        # data = request.form
+    else:
+        data = request.data
+
+    print("DATA", data)
+
     parameters = {
         "path": request.path,
-        "parameters": request.data
+        "parameters": data
     }
 
     print(colored("parameters:", "magenta"), parameters)

@@ -187,13 +187,12 @@ async def get_nota_finala(request):
         cursor_marks = await MidtermMark.find(sort='student')
         
         marks = cursor_marks.objects
-        print("marks", marks)
         results = []
         for obj in marks:
             if obj.student == student:
                 results.append(int(obj.mark))
 
-        print("results", results)
+        print("results marks:", results)
         # midterm_marks_cursor = await MidtermMark.find({"student":student})
         # # midterm_marks = await midterm_marks_cursor.to_list()
 
