@@ -15,8 +15,8 @@
 - `GET /nota-examen {"student": "NumePrenume"}`
 - `POST /s2-nota-atestare { “student”: “NumePrenume1”, “nota”: 9, “nr_atestare”:1}`
 - `GET /s2-nota-atestare { “student”: “NumePrenume1”, “nr_atestare”:1}`
-- `GET /nota-finala => {“student”: “NumePrenume1”, “note_atestari”: [“atest1”: nota, “atest2”: “”] “nota_examen” : nota_examen ,“nota_finala”: 9.88} (daca o atestare lipseste, sau examenul, la nota finala ii returneaza eroare)`
-- `POST /s2-validate-student-marks => {"student": "NumePrenume", "tip": "atestare"}    "tip" poate fi 'examen' sau 'atestare'
+- `GET /nota-finala => {“student”: “NumePrenume1”, “note_atestari”: [“atest1”: nota, “atest2”: “”] “nota_examen” : nota_examen ,“nota_finala”: 9.88}` (daca o atestare lipseste, sau examenul, la nota finala ii returneaza eroare)
+- `POST /s2-validate-student-marks => {"student": "NumePrenume", "tip": "atestare"}`    "tip" poate fi 'examen' sau 'atestare'
 
 - `GET /get-all-exam-marks`
 - `GET /get-all-midterm-marks`
