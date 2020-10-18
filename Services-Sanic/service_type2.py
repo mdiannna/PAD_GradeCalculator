@@ -21,8 +21,12 @@ from termcolor import colored
 
 app = Sanic(__name__)
 
+# documentation:
 # https://github.com/lixxu/sanic-motor
 # https://github.com/lixxu/sanic-motor/blob/master/example/myapp.py
+
+# tutorial to delete database;
+# https://www.tutorialkart.com/mongodb/mongodb-delete-database/
 
 # "mongodb://127.0.0.1:27017"
 settings = dict(MOTOR_URI='mongodb://localhost:27017/service2-mongo-students',
@@ -46,13 +50,16 @@ async def nota_examen(request):
     if request.method=='POST':
         student = request.json.get("student", "")
         nota = request.json.get("nota", "")
-        # TODO
-        await ExamMark.insert_one(dict(student=student, mark=int(nota), status="processing"))
 
-        return response.json({"status": "success", "message": "Exam mark saved successfully"})
-    
-        # return m.save_exam_mark(student, nota)
+        is_uniq = await ExamMark.is_unique(doc=dict(student=student))
+        
+        if is_uniq in (True, None):
+            await ExamMark.insert_one(dict(student=student, mark=int(nota), status="processing"))
 
+            return response.json({"status": "success", "message": "Exam mark saved successfully"})
+        else:
+            return response.json({"status": "error", "message": "This student already has exam mark!"})        
+        
     else: #GET
         """
         curl -X GET \
@@ -85,19 +92,32 @@ async def nota_examen(request):
 
 
 # curl -d '{"name":"Diana Marusic", "age": "22"}' -H 'Content-Type: application/json' http://127.0.0.1:8000/new
-@app.route("/nota-atestare", methods=["POST"])
+@app.route("/s2-nota-atestare", methods=["POST", 'GET'])
 async def nota_atestare(request):
+
+    print(colored("request:", "blue"))
+    print(request)
+    print(colored("request json:", "blue"))
+    print(request.json)
+    print(colored("-------:", "blue"))
+
     if request.method=="POST":
         student = request.json.get("student", "")
         nota = request.json.get("nota", "")
-        nr_atestare = request.json.get("nr_atestare", "")
+        nr_atestare = int(request.json.get("nr_atestare", ""))
 
-        try:
-            await MidtermMark.insert_one(dict(student=student, mark=int(nota), midterm_nr=nr_atestare, status="processing"))
+        is_uniq = await MidtermMark.is_unique(doc=dict(student=student, midterm_nr=nr_atestare))
+        
+        if is_uniq in (True, None):
+            try:
+                await MidtermMark.insert_one(dict(student=student, mark=int(nota), midterm_nr=nr_atestare, status="processing"))
 
-            return response.json({"status": "success", "message": "Midterm mark saved successfully"})
-        except:
-            return response.json({"status": "error", "message": "Midterm mark not saved or student " + student + ". Error"})
+                return response.json({"status": "success", "message": "Midterm mark saved successfully"})
+            except:
+                return response.json({"status": "error", "message": "Midterm mark not saved or student " + student + ". Error"})
+        else:
+            return response.json({"status": "error", "message": "This student already has mark for midterm " +str(nr_atestare) })        
+
 
     else: #GET
         """
@@ -108,21 +128,26 @@ async def nota_atestare(request):
       "http://127.0.0.1:8000/nota-examen"
       """
 
-        print(colored("request:", "blue"))
-        print(request)
-        print(colored("request json:", "blue"))
-        print(request.json)
-        print(colored("-------:", "blue"))
-
         student = request.json.get("student", "")        
-        nr_atestare = request.json.get("nr_atestare", "")
+        nr_atestare = int(request.json.get("nr_atestare", ""))
 
         # exam_mark = await ExamMark.find_one({"student":student}, as_raw=True)
-        midterm_mark = await MidtermMark.find_one({"student":student, "midterm_nr": nr_atestare})
-        print(colored("midterm mark:", "yellow"), exam_mark)   
+        # midterm_mark = await MidtermMark.find_one({"student":student, "midterm_nr": nr_atestare})
+        # midterm_mark = await MidtermMark.find_one({"student":student})
+        midterm_mark = await MidtermMark.find_one(filter={"midterm_nr":nr_atestare})
+        print(colored("midterm mark:", "yellow"), midterm_mark)   
 
         if midterm_mark:
             return response.json({"status": "success", "student":student, "midterm mark": midterm_mark.mark, "midterm nr:": midterm_mark.midterm_nr})
+        else:
+            return response.json({
+                "status": "success", 
+                "student":student, 
+                "midterm mark": None, 
+                "midterm nr:": nr_atestare, 
+                "message": "No marks found for student '" + student + "' for midterm " + str(nr_atestare)
+            })
+
 
     return response.json({"status": "unknown", "message": "Something went wrong"})
 
@@ -186,9 +211,47 @@ async def get_nota_finala(request):
     
 
 
+@app.route("/s2-validate-student-marks", methods=["POST"])
+async def nota_atestare(request):
+
+    print(colored("request:", "blue"))
+    print(request)
+    print(colored("request json:", "blue"))
+    print(request.json)
+    print(colored("-------:", "blue"))
+
+    if request.method=="POST":
+        student = request.json.get("student", "")
+        ttype = request.json.get("tip", "") # poate fi "examen" sau "atestare"
+
+        if ttype == "examen":
+            try:
+                update = {"status": "finished"}
+                await ExamMark.update_one({"student": student}, {"$set": update})
+
+                return response.json({"status": "success", "message": "Exam mark validated successfully"})
+            except:
+                return response.json({"status": "error", "message": "Exam mark not validated for " + student + ". Error"})
+
+        elif ttype=="atestare":
+            try:
+                update = {"status": "finished"}
+                await MidtermMark.update_many({"student": student}, {"$set": update})
+
+                return response.json({"status": "success", "message": "Midterm marks validated successfully"})
+            except Exception as e:
+                print(colored("Exception:", "red"), e)
+                return response.json({"status": "error", "message": "Midterm marks not validated for " + student + ". Error"})
+        else:
+            return response.json({"status": "error", "message": "Parametrul 'tip' trebuie sa fie 'examen' sau 'atestare'!. Error"})
+
+
+    return response.json({"status": "unknown", "message": "Something went wrong"})
+
+
+
 @app.route("/status", methods=["GET"])
 async def status(request):
-    student = request.json.get("student", "")
     
     try:
         nr_midterm_marks_processing = await MidtermMark.count_documents({'status': "processing"})
@@ -203,6 +266,7 @@ async def status(request):
         return response.json({"status": "error", "message": "Something went wrong"})
 
     return response.json({"status": "unknown", "message": "Something went wrong"})
+
 
 
 #######################
@@ -245,4 +309,5 @@ async def get_all_midterm_marks(request):
 if __name__ == '__main__':
     # app.run(host='127.0.0.1', port=8000, debug=True)
     # 0.0.0.0 accesibil din retea
+    
     app.run(host='0.0.0.0', port=8000, debug=True)

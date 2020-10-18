@@ -16,8 +16,16 @@ from sanic_motor import BaseModel
 # nu stiu daca trebuie id
 class ExamMark(BaseModel):
     __coll__ = 'exam_marks'
-    # __unique_fields__ = ['name']
+    __unique_fields__ = ['student']
 
+
+# {
+# 	"id" : "1",
+# 	"student": "NumePrenume",
+# 	"mark": 10,
+# 	"midterm_nr" : 1,
+# 	"status": "processing"
+# },
 
 class MidtermMark(BaseModel):
     __coll__ = 'midterm_marks'
