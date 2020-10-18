@@ -357,7 +357,6 @@ async def get_all_midterm_marks(request):
 # RPC
 ########################################
 
-# TODO: replace all response.json to to json dumps!!!
 @jsonrpc
 async def get_nota_examen(student):
     # exam_mark = await ExamMark.find_one({"student":student}, as_raw=True)
@@ -366,11 +365,11 @@ async def get_nota_examen(student):
 
     print(colored("exam mark:", "yellow"), exam_mark.mark)   
     if exam_mark:
-        return response.json({"status": "success", "student":student, "exam_mark": exam_mark.mark})
+        return json.dumps({"status": "success", "student":student, "exam_mark": exam_mark.mark})
     else:
-        return response.json({"status": "error", "message": "Exam mark not found for student " + student + ". Error"})
+        return json.dumps({"status": "error", "message": "Exam mark not found for student " + student + ". Error"})
         
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
 
 @jsonrpc
 async def post_nota_examen(student, nota):
@@ -379,9 +378,9 @@ async def post_nota_examen(student, nota):
     if is_uniq in (True, None):
         await ExamMark.insert_one(dict(student=student, mark=int(nota), status="processing"))
 
-        return response.json({"status": "success", "message": "Exam mark saved successfully"})
+        return json.dumps({"status": "success", "message": "Exam mark saved successfully"})
     else:
-        return response.json({"status": "error", "message": "This student already has exam mark!"})        
+        return json.dumps({"status": "error", "message": "This student already has exam mark!"})        
 
     
 @jsonrpc
@@ -394,9 +393,9 @@ async def s2_get_nota_atestare(student, nr_atestare):
     print(colored("midterm mark:", "yellow"), midterm_mark)   
 
     if midterm_mark:
-        return response.json({"status": "success", "student":student, "midterm mark": midterm_mark.mark, "midterm nr:": midterm_mark.midterm_nr})
+        return json.dumps({"status": "success", "student":student, "midterm mark": midterm_mark.mark, "midterm nr:": midterm_mark.midterm_nr})
     else:
-        return response.json({
+        return json.dumps({
             "status": "success", 
             "student":student, 
             "midterm mark": None, 
@@ -405,7 +404,7 @@ async def s2_get_nota_atestare(student, nr_atestare):
         })
 
 
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
     
 @jsonrpc
 async def s2_post_nota_atestare(student, nota, nr_atestare):
@@ -413,7 +412,7 @@ async def s2_post_nota_atestare(student, nota, nr_atestare):
         nr_atestare = int(nr_atestare)
         nota = int(nota)
     except:
-        return response.json({"status": "error", "message": "Wrong parameters " })        
+        return json.dumps({"status": "error", "message": "Wrong parameters " })        
 
     is_uniq = await MidtermMark.is_unique(doc=dict(student=student, midterm_nr=nr_atestare))
     
@@ -424,11 +423,11 @@ async def s2_post_nota_atestare(student, nota, nr_atestare):
         try:
             await MidtermMark.insert_one(dict(student=student, mark=int(nota), midterm_nr=nr_atestare, status="processing"))
 
-            return response.json({"status": "success", "message": "Midterm mark saved successfully"})
+            return json.dumps({"status": "success", "message": "Midterm mark saved successfully"})
         except:
-            return response.json({"status": "error", "message": "Midterm mark not saved or student " + student + ". Error"})
+            return json.dumps({"status": "error", "message": "Midterm mark not saved or student " + student + ". Error"})
     else:
-        return response.json({"status": "error", "message": "This student already has mark for midterm " +str(nr_atestare) })        
+        return json.dumps({"status": "error", "message": "This student already has mark for midterm " +str(nr_atestare) })        
 
     
 @jsonrpc
@@ -463,7 +462,7 @@ async def nota_finala(student):
     except Exception as e:
         print(colored("ERROR!", "red"), e)
         print(colored("--Error!-- No midterm marks found for student " + student, "red"))
-        return response.json({"status": "error", "message":"--Error!-- No midterm marks found for student " + student})
+        return json.dumps({"status": "error", "message":"--Error!-- No midterm marks found for student " + student})
 
     # print(colored("---Midterm marks:", "blue"), midterm_marks)
     # exam_mark = await ExamMark.find_one({"student":student}).objects
@@ -474,7 +473,7 @@ async def nota_finala(student):
         exam_mark = int(exam_mark.mark)
     except:
         print(colored("--Error!-- No exam mark found for student " + student))            
-        return response.json({"status": "error", "message":"--Error!-- No exam mark found for student " + student})
+        return json.dumps({"status": "error", "message":"--Error!-- No exam mark found for student " + student})
 
 
     NR_MIDTERMS = 2
@@ -485,7 +484,7 @@ async def nota_finala(student):
     if exam_mark and midterm_marks and (len(midterm_marks) == NR_MIDTERMS):
         final_mark = PERCENTAGE_EXAM / 100.0 * exam_mark + PERCENTAGE_M1/100.00 * midterm_marks[0] + PERCENTAGE_M2/100.00 * midterm_marks[1]
 
-        return response.json({
+        return json.dumps({
             "status": "success", 
             "student":student,
             "note_atestari": midterm_marks, 
@@ -494,15 +493,15 @@ async def nota_finala(student):
         })
 
     elif len(midterm_marks) != NR_MIDTERMS:
-        return response.json({
+        return json.dumps({
             "status":"error", 
             "message": "Nr of midterms for student " + student + " should be " + str(NR_MIDTERMS) + ", found " + str(len(midterm_marks) )
             }
         )
     else:
-        return response.json({"status": "error", "message":"--Error!-- Something went wrong "})
+        return json.dumps({"status": "error", "message":"--Error!-- Something went wrong "})
 
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
     
     
 @jsonrpc
@@ -514,23 +513,23 @@ async def s2_validate_student_marks(student, tip):
             update = {"status": "finished"}
             await ExamMark.update_one({"student": student}, {"$set": update})
 
-            return response.json({"status": "success", "message": "Exam mark validated successfully"})
+            return json.dumps({"status": "success", "message": "Exam mark validated successfully"})
         except:
-            return response.json({"status": "error", "message": "Exam mark not validated for " + student + ". Error"})
+            return json.dumps({"status": "error", "message": "Exam mark not validated for " + student + ". Error"})
 
     elif ttype=="atestare":
         try:
             update = {"status": "finished"}
             await MidtermMark.update_many({"student": student}, {"$set": update})
 
-            return response.json({"status": "success", "message": "Midterm marks validated successfully"})
+            return json.dumps({"status": "success", "message": "Midterm marks validated successfully"})
         except Exception as e:
             print(colored("Exception:", "red"), e)
-            return response.json({"status": "error", "message": "Midterm marks not validated for " + student + ". Error"})
+            return json.dumps({"status": "error", "message": "Midterm marks not validated for " + student + ". Error"})
     else:
-        return response.json({"status": "error", "message": "Parametrul 'tip' trebuie sa fie 'examen' sau 'atestare'!. Error"})
+        return json.dumps({"status": "error", "message": "Parametrul 'tip' trebuie sa fie 'examen' sau 'atestare'!. Error"})
 
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
 
 
 @jsonrpc
@@ -538,16 +537,16 @@ async def status():
     try:
         nr_midterm_marks_processing = await MidtermMark.count_documents({'status': "processing"})
         nr_exam_marks_processing = await ExamMark.count_documents({'status': "processing"})
-        return response.json({
+        return json.dumps({
             "status": "success", 
             "nr_midterm_marks_processing":nr_midterm_marks_processing, 
             "nr_exam_marks_processing": nr_exam_marks_processing, 
             "total_processing": nr_midterm_marks_processing + nr_exam_marks_processing
             })
     except:
-        return response.json({"status": "error", "message": "Something went wrong"})
+        return json.dumps({"status": "error", "message": "Something went wrong"})
 
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
 
 @jsonrpc
 async def get_all_exam_marks():
@@ -559,10 +558,10 @@ async def get_all_exam_marks():
         for obj in marks:
             results[obj.student] = obj.mark
 
-        return response.json({"status": "success", "results":results})
+        return json.dumps({"status": "success", "results":results})
     except:
-        return response.json({"status": "error", "message": "Something went wrong"})
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+        return json.dumps({"status": "error", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
 
 @jsonrpc
 async def get_all_midterm_marks():
@@ -574,10 +573,10 @@ async def get_all_midterm_marks():
         for obj in marks:
             results[obj.student] = {"midterm_nr": obj.midterm_nr, "mark": obj.mark}
 
-        return response.json({"status": "success", "results":results})
+        return json.dumps({"status": "success", "results":results})
     except:
-        return response.json({"status": "error", "message": "Something went wrong"})
-    return response.json({"status": "unknown", "message": "Something went wrong"})
+        return json.dumps({"status": "error", "message": "Something went wrong"})
+    return json.dumps({"status": "unknown", "message": "Something went wrong"})
 
 
 if __name__ == '__main__':
