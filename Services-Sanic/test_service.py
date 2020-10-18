@@ -11,7 +11,8 @@ def make_request(method, endpoint, parameters):
     if method=='GET':
         r = requests.get(endpoint, params=parameters)
     elif method=='POST':
-        r = requests.post(endpoint, data=parameters)
+        #r = requests.post(endpoint, data=json.dumps(parameters))
+        r = requests.post(endpoint, data=json.dumps(parameters))
     elif method=='PUT':
         r = requests.put(endpoint, data=parameters)
     elif method=='DELETE':
@@ -31,8 +32,9 @@ def post_exam_mark():
     print("parameters:",parameters)
 
     try:
-        # r = requests.post(endpoint, data=parameters)
-        r = requests.post(endpoint, json=parameters)
+        #r = requests.post(endpoint, data=json.dumps(parameters))
+        r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.post(endpoint, json=parameters)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
         pp.pprint(r.json())
@@ -49,7 +51,8 @@ def get_all_exam_marks():
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     try:
-        # r = requests.post(endpoint, data=parameters)
+        # #r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.post(endpoint, data=json.dumps(parameters))
         r = requests.get(endpoint)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
@@ -72,8 +75,10 @@ def get_exam_mark():
     print("parameters:",parameters)
 
     try:
-        # r = requests.post(endpoint, data=parameters)
-        r = requests.get(endpoint, json=parameters)
+        # #r = requests.post(endpoint, data=json.dumps(parameters))
+        r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.get(endpoint, json=parameters)
+        # r = requests.get(endpoint, params=parameters)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
         pp.pprint(r.json())
@@ -100,7 +105,8 @@ def test_get_midterm_mark(existing=True):
     print("parameters:",parameters)
 
     try:
-        r = requests.get(endpoint, json=parameters)
+        # r = requests.get(endpoint, json=parameters)
+        r = requests.get(endpoint, params=parameters)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
         pp.pprint(r.json())
@@ -123,8 +129,9 @@ def test_post_midterm_mark(midterm_nr=1):
     print("parameters:",parameters)
 
     try:
-        # r = requests.post(endpoint, data=parameters)
-        r = requests.post(endpoint, json=parameters)
+        r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.post(endpoint, json=parameters)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
         pp.pprint(r.json())
@@ -140,7 +147,8 @@ def get_all_midterm_marks():
     print(colored("-------REQUEST " + endpoint, "blue"))
 
     try:
-        # r = requests.post(endpoint, data=parameters)
+        # #r = requests.post(endpoint, data=json.dumps(parameters))
+        r = requests.post(endpoint, data=json.dumps(parameters))
         r = requests.get(endpoint)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
@@ -163,7 +171,8 @@ def get_final_mark():
     print("parameters:",parameters)
 
     try:
-        r = requests.get(endpoint, json=parameters)
+        # r = requests.get(endpoint, json=parameters)
+        r = requests.get(endpoint, params=parameters)
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
         pp.pprint(r.json())
@@ -203,7 +212,10 @@ def test_validate_marks(ttype):
     print("parameters:",parameters)
 
     try:
-        r = requests.post(endpoint, json=parameters)
+        # r = requests.post(endpoint, json=parameters)
+        r = requests.post(endpoint, data=json.dumps(parameters))
+        # r = requests.post(endpoint, data=json.dumps(parameters))
+        
         print(colored("response:---", "green"))
         print(colored("status code:"+str(r.status_code), "yellow"))
         pp.pprint(r.json())
@@ -219,27 +231,27 @@ def test_validate_midterm_marks():
     test_validate_marks(ttype="atestare")
 
 if __name__ == '__main__':
-    post_exam_mark()
-    get_all_exam_marks()
-    get_exam_mark()
-    # print("-----------")
-    test_post_midterm_mark(midterm_nr=1)
-    test_post_midterm_mark(midterm_nr=2)
+    # # post_exam_mark()
+    # get_all_exam_marks()
+    # get_exam_mark()
+    # # print("-----------")
+    # test_post_midterm_mark(midterm_nr=1)
+    # test_post_midterm_mark(midterm_nr=2)
     # test_post_midterm_mark(midterm_nr=3)
 
-    get_all_midterm_marks()
-    # print("-----------")
-    test_get_midterm_mark()
+    # get_all_midterm_marks()
+    # # print("-----------")
+    # test_get_midterm_mark()
 
-    test_get_midterm_mark(existing=False) #shoudl return "no marks found"
+    # test_get_midterm_mark(existing=False) #shoudl return "no marks found"
 
-    # print("-----------")
-    get_final_mark()
+    # # print("-----------")
+    # get_final_mark()
     
-    get_status()
+    # get_status()
 
     test_validate_exam_marks()
-    test_validate_midterm_marks()
+    # test_validate_midterm_marks()
 
     get_status()
     # 
