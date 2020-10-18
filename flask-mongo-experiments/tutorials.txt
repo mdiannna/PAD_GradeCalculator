@@ -1,0 +1,35 @@
+
+use on ubuntu:
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+$sudo systemctl status mongod
+$sudo systemctl enable mongod
+
+$sudo systemctl restart mongod
+
+$mongo
+
+
+if needed
+$sudo systemctl daemon-reload
+
+https://realpython.com/introduction-to-mongodb-and-python/
+
+
+https://kb.objectrocket.com/elasticsearch/how-to-setup-a-mongodb-app-using-the-flask-framework-557
+
+
+
+
+Tutorial:
+1. Install mongo on your OS. 
+For ubuntu, use:
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+
+For windows, use:
+https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
+
+2. pip3 install pymongo
+
+Example of flask running code:
+3. run app3.py

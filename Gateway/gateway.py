@@ -25,7 +25,9 @@ app = Flask(__name__)
 # redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 
 # redis_cache = redis.Redis(host='172.18.0.1', port=6379, db=0)
+# for docker:
 redis_cache = redis.Redis(host='redis', port=6379, db=0)
+# redis_cache = redis.Redis(host='localhost', port=6379, db=0)
 load_balancer = LoadBalancer()
 
 @app.route('/')
@@ -35,6 +37,7 @@ def index():
 
 @app.route('/<path>', methods=['GET', 'POST'])
 def router(path):    
+    print(colored("----Request to path:" + path, "yellow"))
     # NOTE: RPC works only with underscore(_) request, but new feature added that gateway can process both _ and - request, so we allow both
     map_service_type_paths = {
         "init-student" : "type1",
@@ -48,7 +51,16 @@ def router(path):
         "pune-nota_atestare" : "type2",
         "pune_nota_atestare" : "type2",
         "nota-finala": "type2",
-        "nota_finala": "type2"
+        "nota_finala": "type2",
+        "get-all-exam-marks": "type2",
+        "get-all-midterm-marks": "type2",
+        "s2-nota-atestare": "type2",
+        "s2-validate-student-marks":"type2",
+
+
+        "s2-status": "type2",
+        "s1-status": "type1",
+        "status" : ""
     }
 
     allowed_paths = map_service_type_paths.keys()
@@ -59,13 +71,31 @@ def router(path):
 
     service_type = map_service_type_paths[path]
 
+    if path == "s1-status":
+        path = "status"
+        service_type = "type1"
+    elif path == "s2-status":
+        path = "status"
+        service_type = "type2"
+
     if not load_balancer.any_available(redis_cache, service_type):
         # TODO: check if 400 bad request is ok or maybe return "no service available" or smth error????
         return abort(400, "No services available")
 
+    if request.method == 'GET':
+        data = request.args
+    elif request.method == 'POST':
+        data = request.data
+        # data = request.form
+    else:
+        data = request.data
+
+    print("DATA", data)
+
     parameters = {
-        "path": request.path,
-        "parameters": request.data
+        # "path": request.path,
+        "path": path,
+        "parameters": data
     }
 
     print(colored("parameters:", "magenta"), parameters)
