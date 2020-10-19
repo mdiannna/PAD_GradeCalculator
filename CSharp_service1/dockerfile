@@ -6,4 +6,4 @@ COPY . .
 
 RUN dotnet build -c Release
 
-ENTRYPOINT ["dotnet", "run", "--no-launch-profile"]
+ENTRYPOINT ["dotnet", "run", "--urls=http://0.0.0.0:50757/"]
