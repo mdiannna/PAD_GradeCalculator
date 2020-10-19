@@ -50,10 +50,11 @@ sudo docker run --name gateway -p 5000:5000 flask-gateway
 
 
 
+sudo service redis stop
 sudo docker build -t service-sanic2 .
 
-sudo service redis stop
 
+sudo docker build -t csharp-service1 .
 
 
 
@@ -98,8 +99,41 @@ $ cd Gateway
 $ sudo docker build -t flask-gateway .
 $ cd ../Services-Sanic
 $ sudo docker build -t service-sanic2 .
+
+$cd ../CSharp-service1
+$ sudo docker build -t csharp-service1 .
+
 $ sudo docker-compose up
 $ curl -d '{"service_name": "Service-Sanic2", "address": "http://service-s2:8000/", "type":"type2"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/service-register
 
 se poate de testat
 $ python Services-Sanic/test_service.py
+
+
+tutorial bd bash:
+https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-ver15&pivots=cs1-bash
+
+
+
+CREATE TABLE Students (Id INT PRIMARY KEY, Name VARCHAR(50), Status VARCHAR(50), Grupa VARCHAR(20) )
+CREATE TABLE Marks (Id INT PRIMARY KEY, Value INT, Type NVARCHAR(50), AtestationNo INT, StudentId INT, Status NVARCHAR(50) )
+
+INT PRIMARY KEY IDENTITY (1, 1)
+
+
+---pentru database sqlserver!!!!! dupa docker compose up---
+
+sudo docker exec -ti f79ba161b664 bash
+
+/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "PAD_password123"
+
+CREATE DATABASE University
+GO
+CREATE TABLE Students (Id INT PRIMARY KEY IDENTITY (1, 1), Name VARCHAR(50), Status VARCHAR(50), Grupa VARCHAR(20) )
+GO
+CREATE TABLE Marks (Id INT PRIMARY KEY  IDENTITY (1, 1), Value INT, Type NVARCHAR(50), AtestationNo INT, StudentId INT, Status NVARCHAR(50) )
+GO
+
+
+
+https://www.sqlservertutorial.net/sql-server-basics/sql-server-create-table/

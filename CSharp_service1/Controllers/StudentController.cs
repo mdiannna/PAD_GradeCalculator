@@ -36,7 +36,7 @@ namespace UserMicroservice.Controllers
             universityContext.SaveChanges();
 
 
-            return Ok(new { Id = student.Id, Status = student.Status, Result = new {Name = student.Name, Group = student.Group } });
+            return Ok(new { Id = student.Id, Status = student.Status, Result = new {Name = student.Name, Grupa = student.Grupa } });
         }
 
         // POST: api/User
@@ -73,7 +73,7 @@ namespace UserMicroservice.Controllers
             var student = new Student
             {
                 Name = studentDTO.Name,
-                Group = studentDTO.Group
+                Grupa = studentDTO.Grupa
             };
 
             var createdStudent = universityContext.Students.Add(student);
@@ -124,10 +124,10 @@ namespace UserMicroservice.Controllers
 
         // PUT: api/User/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] string group)
+        public IActionResult Put(int id, [FromBody] string Grupa)
         {
             var student = universityContext.Students.FirstOrDefault(s => s.Id == id);
-            student.Group = group;
+            student.Grupa = Grupa;
             universityContext.Entry(student).State = EntityState.Modified;
             universityContext.SaveChanges();
 
