@@ -44,9 +44,15 @@ services:
       - 50757
     depends_on:
       - sqldb
+    # command:
+    #   - bash -c "dotnet ef database update"
   sqldb:
     container_name: sqldb
     image: "mcr.microsoft.com/mssql/server"
+    # image: microsoft/mssql-server-linux:2017-latest
+    ports:
+      - 1434:1434
+      - 1401:1433
     environment:
-        SA_PASSWORD: "Your_password123"
+        SA_PASSWORD: "PAD_password123"
         ACCEPT_EULA: "Y"
